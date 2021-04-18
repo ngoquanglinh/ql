@@ -1,0 +1,262 @@
+<div class="modal-dialog" style="min-width: 80%" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Thêm công văn</h3>
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="sub-title p-2">Số văn bản</div>
+                        <div>
+                            <input type="text" class="form-control" value="" id="numberDocumentary"
+                                placeholder="Tên công văn...">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="sub-title p-2">Tên văn bản</div>
+                        <div>
+                            <input type="text" class="form-control" id="name" value="" placeholder="Tên công văn...">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="sub-title p-2">Nơi gửi</div>
+                        <div>
+                            <input type="text" class="form-control" id="addressSending" value=""
+                                placeholder="Tên công văn...">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="sub-title p-2">Nơi ký</div>
+                        <div>
+                            <input type="text" class="form-control" value="" id="addressSign" value=""
+                                placeholder="Tên công văn...">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="sub-title p-2">Loại văn bản</div>
+                        <div>
+                            <select class="select-category w-100" value="">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="sub-title p-2">Người nhận</div>
+                        <div>
+                            <select class="select-user w-100" multiple="multiple" value="">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="sub-title p-2">Ngày gửi</div>
+                        <div>
+                            <input type="text" class="form-control" id="calendar-tomorrow" value="">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="sub-title p-2">Ngày hiệu lực</div>
+                        <div>
+                            <input type="text" class="form-control" id="effectiveDate" value="">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="sub-title p-2">Ngày hết hiệu lực</div>
+                        <div>
+                            <input type="text" class="form-control" id="expirationDate" value="">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="sub-title p-2">Tóm tắt</div>
+                        <div>
+                            <textarea class="form-control" rows="3" value="" id="summary"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="sub-title p-2">Tệp đính kèm</div>
+                        <div>
+                            <input type="file" class="form-control-file" value="" id="fileUploads" multiple>
+                        </div>
+                    </div>
+                    <div class="col" id="listImage">
+                    </div>
+                </div>
+                <div class="sub-title p-2">Nội dung</div>
+                <div>
+                    <textarea cols="10" class="form-control" rows="3" id="contentDocumentary"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+            <button type="button" class="btn btn-primary" id="submitAddDocumentary">Thêm</button>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var host = window.location.protocol + '//' + window.location.host;
+    tinymce.init({
+        selector: '#contentDocumentary',
+        plugins: 'image media link tinydrive code imagetools paste',
+        toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+        image_title: true,
+        automatic_uploads: true,
+        file_picker_types: 'file image media',
+        images_upload_handler: function (blobInfo, success, failure) {
+            var xhr, formData;
+            xhr = new XMLHttpRequest();
+            xhr.withCredentials = false;
+            xhr.open('POST', '/uploads');
+            xhr.onload = function () {
+                var json;
+
+                if (xhr.status != 200) {
+                    failure('HTTP Error: ' + xhr.status);
+                    return;
+                }
+                json = JSON.parse(xhr.responseText);
+
+                if (!json || typeof json.location != 'string') {
+                    failure('Invalid JSON: ' + xhr.responseText);
+                    return;
+                }
+                success(json.location);
+            };
+            formData = new FormData();
+            formData.append('file', blobInfo.blob(), blobInfo.filename());
+            xhr.send(formData);
+        },
+    });
+
+    // todo: select users
+    $(window).load(function () {
+        callApi('user', 'Get').then(res => {
+            return res.json();
+        }).then(res => {
+            var data = res.users.map(x => { return { "id": x.id, "text": x.username } });
+            $(".select-user").select2({
+                placeholder: "Người nhận...",
+                allowClear: true,
+                data: data,
+                tags: true,
+                tokenSeparators: [',', ' ']
+            });
+        })
+    });
+
+    // todo: categorys
+    $(window).load(function () {
+        callApi('documentary/category-list', 'Get').then(res => {
+            return res.json();
+        }).then(res => {
+            var data = res.users.map(x => { return { "id": x.id, "text": x.name } });
+            $(".select-category").select2({
+                placeholder: "Loại công văn...",
+                minimumResultsForSearch: Infinity,
+                data: data,
+            });
+        })
+    });
+    // todo : calendar
+    flatpickr('#calendar-tomorrow', {
+        "minDate": new Date().fp_incr(1),
+        dateFormat: "d-m-Y",
+    });
+    $("#calendar-tomorrow").flatpickr({
+        "minDate": new Date().fp_incr(1),
+        dateFormat: "d-m-Y",
+    });
+    flatpickr('#effectiveDate', {
+        "minDate": new Date().fp_incr(1),
+        dateFormat: "d-m-Y",
+    });
+    flatpickr('#expirationDate', {
+        "minDate": new Date().fp_incr(1),
+        dateFormat: "d-m-Y",
+    });
+
+    // todo : uploads
+    $("#fileUploads").change(function () {
+        const formData = new FormData();
+        const file = document.querySelector("#fileUploads");
+        for (let i = 0; i < file.files.length; i++) {
+            formData.append('files', file.files[i]);
+        }
+        uploads('uploads/multiple', 'POST', formData).then(res => {
+            return res.json();
+        }).then(res => {
+            let images = res.location.map(x => host + "/" + x);
+            let box = $("#listImage");
+            let div = document.createElement("div");
+            div.className = "d-flex";
+            images.map(x => {
+                let img = document.createElement("img");
+                img.className = "image-upload";
+                img.src = x;
+                div.appendChild(img);
+            })
+            box.append(div);
+        })
+    });
+
+    //todo: submit
+    $("#submitAddDocumentary").click(function () {
+        const numberDocumentary = $("#numberDocumentary").val();
+        const name = $("#name").val();
+        const addressSending = $("#addressSending").val();
+        const addressSign = $("#addressSign").val();
+        const selectCategory = $(".select-category").val();
+        const selectUser = $(".select-user").val();
+        const calendarTomorrow = $("#calendar-tomorrow").val();
+        const effectiveDate = $("#effectiveDate").val();
+        const expirationDate = $("#expirationDate").val();
+        const summary = $("#summary").val();
+        var content = tinymce.get("contentDocumentary").getContent();
+        const images = $(".image-upload");
+        let urlImage = [];
+        for (let i = 0; i <= images.length - 1; i++) {
+            console.log(images[i]);
+            urlImage.push((images[i].src).substr((images[i].src).indexOf('/', 8) + 1));
+        }
+        const data = {
+            numberDocumentary,
+            name,
+            addressSending,
+            addressSign,
+            selectCategory,
+            selectUser,
+            calendarTomorrow: moment(flatpickr.parseDate(calendarTomorrow, "d/m/Y")).format("YYYY-MM-DD h:mm:ss"),
+            effectiveDate: moment(flatpickr.parseDate(effectiveDate, "d/m/Y")).format("YYYY-MM-DD h:mm:ss"),
+            expirationDate: moment(flatpickr.parseDate(expirationDate, "d/m/Y")).format("YYYY-MM-DD h:mm:ss"),
+            summary,
+            content,
+            urlImage
+        }
+        callApi('documentary', 'Post', data).then(res => {
+            return res.json();
+        }).then(res => {
+            console.log(res, "aa");
+            // var data = res.users.map(x => { return { "id": x.id, "text": x.name } });
+            // $(".select-category").select2({
+            //     placeholder: "Loại công văn...",
+            //     minimumResultsForSearch: Infinity,
+            //     data: data,
+            // });
+            notify("success", "Thêm thành công");
+            const row = '<tr>' +
+                '<td>' + "" + '</td>' +
+                '<td>' + res.item.username + '</td>' +
+                '<td>' + res.item.email + '</td>' +
+                '<td><i class="far fa-trash-alt deleteUser" attr-id="' + res.item.id + '"></i><i class="far fa-edit" attr-id="' + res.item.id + '"></i></td>' +
+                '</tr>';
+            $("#table-user").append(row);
+        })
+    });
+</script>

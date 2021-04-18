@@ -1,0 +1,169 @@
+<div id="page-wrapper">
+    <div id="page-inner">
+        <!-- /. ROW  -->
+        <div class="board">
+            <div class="panel panel-default mb-0 border-bottom pointer p-1">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        Danh mục công văn
+                    </h4>
+                    <div class="mt-2 d-flex justify-content-end">
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#modalAddUser">Thêm</button>
+                        <div class="modal fade" id="modalAddUser" tabindex="-1" role="dialog"
+                            aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4>Thêm danh mục</h4>
+                                        <button type="button" class="close" data-dismiss="modal"
+                                            aria-hidden="true">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form>
+                                            <div>
+                                                <div class="sub-title p-2">Tên danh mục</div>
+                                                <div>
+                                                    <input type="text" class="form-control" id="nameCategoryAdd"
+                                                        value="" placeholder="Tên danh mục..." required>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+                                        <button type="button" class="btn btn-primary" id="addCategory">Thêm</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal fade" id="modalEditCategory" tabindex="-1" role="dialog"
+                            aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4>Sửa danh mục</h4>
+                                        <button type="button" class="close" data-dismiss="modal"
+                                            aria-hidden="true">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p id="errorEdit" class="d-none text-danger"></p>
+                                        <form>
+                                            <div>
+                                                <div class="sub-title p-2">Tên</div>
+                                                <div>
+                                                    <input type="text" class="form-control" id="nameEditCategory"
+                                                        value="" placeholder="Tên..." required>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+                                        <button type="button" class="btn btn-primary" data-id=""
+                                            id="submitEditCategory">Sửa</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-borderless" id="table-user">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Tên</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach( (item,index) => { %>
+                            <tr id="user-row-<%= item.id %>">
+                                <td><%= index+1 %></td>
+                                <td><%= item.name %></td>
+                                <td>
+                                    <i class="far fa-trash-alt deleteCategory" attr-id="<%= item.id %>"></i>
+                                    <i class="far fa-edit editUser" onclick="editCategory(<%= JSON.stringify(item) %>)"
+                                        data-toggle="modal" data-target="#modalEditCategory"
+                                        attr-id="<%= item.id %>"></i>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- /. PAGE INNER  -->
+        </div>
+    </div>
+
+    <script>
+        //tode : delete user
+        $(".deleteCategory").click(function () {
+            if (window.confirm("Bạn có chắc muốn xóa")) {
+                const id = $(this).attr("attr-id");
+                callApi('documentary/category/' + id, 'Delete').then(res => {
+                    return res.json();
+                }).then(res => {
+                    if (res.success) {
+                        notify("success", "Xóa thành công");
+                        // $("#user-row-" + id).remove();
+                        setTimeout(() => {
+                            window.location.href = window.location.href;
+                        }, 1000);
+                    }
+                })
+            }
+        })
+
+        // todo: add user
+        $("#addCategory").click(function () {
+            const name = $("#nameCategoryAdd").val();
+            const data = {
+                name
+            }
+            callApi('documentary/category', 'POST', data).then(res => {
+                return res.json();
+            }).then(res => {
+                if (res.success) {
+                    notify("success", "Thêm thành công");
+                    // const row = '<tr>' +
+                    //     '<td>' + "" + '</td>' +
+                    //     '<td>' + res.item.name + '</td>' +
+                    //     '<td><i class="far fa-trash-alt deleteCategory" attr-id="' + res.item.id + '"></i><i class="far fa-edit" attr-id="' + res.item.id + '"></i></td>' +
+                    //     '</tr>';
+                    // $("#table-user").append(row);
+                    setTimeout(() => {
+                        window.location.href = window.location.href;
+                    }, 1000);
+                }
+            })
+        })
+
+        // todo: edit user
+        function editCategory(item) {
+            $("#nameEditCategory").val(item.name);
+            $("#submitEditCategory").attr("data-id", item.id)
+        }
+        $("#submitEditCategory").click(function () {
+            const id = $(this).attr("data-id");
+            const name = $("#nameEditCategory").val();
+            const data = {
+                name, id
+            }
+            callApi('documentary/category', 'put', data).then(res => {
+                return res.json();
+            }).then(res => {
+                console.log(res);
+                if (res.success) {
+                    notify("success", res.message);
+                    setTimeout(() => {
+                        window.location.href = window.location.href;
+                    }, 1000);
+                } else {
+                    $("#errorEdit").removeClass("d-none");
+                    $("#errorEdit").text(res.message);
+                }
+            })
+        })
+    </script>

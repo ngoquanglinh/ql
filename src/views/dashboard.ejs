@@ -1,0 +1,74 @@
+<div id="page-wrapper">
+    <div id="page-inner">
+        <!-- /. ROW  -->
+        <div class="mt-2 mb-3 d-flex justify-content-end">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#addDocumentary">Thêm</button>
+            <div class="modal fade" id="addDocumentary" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                aria-hidden="true">
+                <%- include("./partials/addDocumentary.ejs")  %>
+            </div>
+        </div>
+        <div class="board">
+            <% lists.forEach( (item,index) => { %>
+            <div class="panel panel-default mb-0 border-bottom pointer p-1">
+                <div class=" panel-heading">
+                    <h4 class="panel-title">
+                        <div data-toggle="collapse" class="panel-user" data-id="<%= item.idSender %>"
+                            data-parent="#accordion" href="#collapse<%= item.idSender %>" class="collapsed">
+                            <div class="d-flex justify-content-between">
+                                <div class="d-flex">
+                                    <%if (item.avatar) { %>
+                                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcZCYERoPn24ieZkxN4AlFxpHA0iCrqogPOg&usqp=CAU"
+                                        class="avatar" />
+                                    <% }else{ %>
+                                    <div class="avatar">
+                                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcZCYERoPn24ieZkxN4AlFxpHA0iCrqogPOg&usqp=CAU"
+                                            class="avatar" />
+                                    </div>
+                                    <% } %>
+                                    <div>
+                                        <span class="p-1"><%= item.username %></span>
+                                        <p class="m-0 p-1 ml-1">
+                                            <%= item.total %> Công văn
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </h4>
+                </div>
+                <div id="collapse<%= item.idSender %>" class="panel-collapse collapse" style="height: 0px;">
+                </div>
+            </div>
+            <% }) %>
+        </div>
+        <!-- /. PAGE INNER  -->
+    </div>
+
+    <script>
+        // window.addEventListener('load', function () {
+        //     var myVar = <% - JSON.stringify(lists) %>;
+        //     console.log(myVar, "asd");
+        // });
+        $(".panel-user").click(function () {
+            const id = $(this).attr("data-id");
+            const show = $(this).attr("aria-expanded");
+            if (!show) {
+                callApi('documentary/' + id, 'get').then(res => {
+                    return res.json();
+                }).then(res => {
+                    if (res.success) {
+                        var row = '';
+                        res.items.map(x => {
+                            row += '<div class="panel-body  border rounded mb-1">' +
+                                x.name
+                            '</div>';
+                            $("#collapse" + id).append(row);
+                            row = "";
+                        })
+
+                    }
+                })
+            }
+        })
+    </script>
