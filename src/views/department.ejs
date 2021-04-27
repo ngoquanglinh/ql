@@ -368,7 +368,6 @@
                 })
             }
             function showEditClaim() {
-                const item = JSON.parse(decodeURIComponent($(`#btnEditRole${id}`).attr("data-value")));
                 $("#modalEditClaim").modal("show");
                 $("#modalListRoles").modal("hide");
                 callApi('department/claim', 'get').then(res => {
