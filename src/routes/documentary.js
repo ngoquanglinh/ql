@@ -19,6 +19,10 @@ let documentaryRoutes = (app) => {
 
     router.post("/", loginController.checkLoggedIn, documentaryController.handleAddDocumentary);
     router.get("/:id", loginController.checkLoggedIn, documentaryController.handleGetDocumentary);
+    router.delete("/:id", loginController.checkLoggedIn, documentaryController.handleDeleteDocumentary);
+    router.put("/:id", loginController.checkLoggedIn, documentaryController.handleEditDocumentary);
+    router.get("/attachments/:id", loginController.checkLoggedIn, documentaryController.handleGetAttachments);
+    router.get("/users/:id", loginController.checkLoggedIn, documentaryController.handleGetUsers);
     return app.use("/documentary", router);
 };
 module.exports = documentaryRoutes;

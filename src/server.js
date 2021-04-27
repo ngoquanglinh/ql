@@ -13,6 +13,7 @@ const initWebRoutes = require("./routes/web");
 const uploadRoutes = require("./routes/uploads");
 const userRoutes = require("./routes/user");
 const documentaryRoutes = require("./routes/documentary");
+const departmentRoutes = require("./routes/department");
 //
 
 let app = express();
@@ -51,17 +52,21 @@ app.use(passport.session());
 initWebRoutes(app);
 uploadRoutes(app);
 userRoutes(app);
-documentaryRoutes(app)
+documentaryRoutes(app);
+departmentRoutes(app)
 //
 
 //Tạo socket 
 io.on('connection', function (socket) {
-    console.log('Welcome to server chat');
-    socket.on('join', function (data) {
-        console.log(data, "nghe");
-        io.sockets.emit('send', data);
+    // socket.on('join', function (data) {
+    //     // io.sockets.emit('documentary', data);
+    // });
+    socket.on('documentary', function (data) {
+        io.sockets.emit('documentary', data);
     });
 });
 
 let port = process.env.PORT || 5000;
-app.listen(port, () => console.log(`Building a login system with NodeJS is running on port ${port}!`));
+
+server.listen(port, () => console.log(`Building a login system with NodeJS is running on port ${port}!`));
+exports.io = io;

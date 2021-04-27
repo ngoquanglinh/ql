@@ -9,8 +9,8 @@
                     </h4>
                     <div class="mt-2 d-flex justify-content-end">
                         <button class="btn btn-primary" data-toggle="modal" data-target="#modalAddUser">Thêm</button>
-                        <div class="modal fade" id="modalAddUser" tabindex="-1" role="dialog"
-                            aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal" id="modalAddUser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                            aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -36,7 +36,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="modal fade" id="modalEditCategory" tabindex="-1" role="dialog"
+                        <div class="modal" id="modalEditCategory" tabindex="-1" role="dialog"
                             aria-labelledby="myModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
@@ -100,20 +100,22 @@
     <script>
         //tode : delete user
         $(".deleteCategory").click(function () {
-            if (window.confirm("Bạn có chắc muốn xóa")) {
-                const id = $(this).attr("attr-id");
-                callApi('documentary/category/' + id, 'Delete').then(res => {
-                    return res.json();
-                }).then(res => {
-                    if (res.success) {
-                        notify("success", "Xóa thành công");
-                        // $("#user-row-" + id).remove();
-                        setTimeout(() => {
-                            window.location.href = window.location.href;
-                        }, 1000);
-                    }
-                })
-            }
+            swal("Bạn có muốn xóa", "confirm").then(x => {
+                if (x) {
+                    const id = $(this).attr("attr-id");
+                    callApi('documentary/category/' + id, 'Delete').then(res => {
+                        return res.json();
+                    }).then(res => {
+                        if (res.success) {
+                            notify("success", "Xóa thành công");
+                            // $("#user-row-" + id).remove();
+                            setTimeout(() => {
+                                window.location.href = window.location.href;
+                            }, 1000);
+                        }
+                    })
+                }
+            })
         })
 
         // todo: add user
@@ -154,7 +156,6 @@
             callApi('documentary/category', 'put', data).then(res => {
                 return res.json();
             }).then(res => {
-                console.log(res);
                 if (res.success) {
                     notify("success", res.message);
                     setTimeout(() => {

@@ -1,4 +1,4 @@
-import DBConnection from "./../configs/DBConnection";
+import db from "./../configs/DBConnection";
 import registerService from "../services/registerService";
 import bcrypt from "bcryptjs";
 // todo get all users
@@ -12,7 +12,7 @@ let handleGetAllUser = async (req, res) => {
 let getAllUser = () => {
     return new Promise((resolve, reject) => {
         try {
-            DBConnection.query(
+            db.query(
                 ' SELECT * FROM users',
                 function (err, rows) {
                     if (err) {
@@ -50,7 +50,7 @@ let handleDeleteUser = async (req, res) => {
 let deleteUser = (id) => {
     return new Promise((resolve, reject) => {
         try {
-            DBConnection.query(
+            db.query(
                 'DELETE  FROM users WHERE id = ?', id,
                 function (err, rows) {
                     if (err) {
@@ -67,7 +67,7 @@ let deleteUser = (id) => {
 let deleteDocumentary = (id) => {
     return new Promise((resolve, reject) => {
         try {
-            DBConnection.query(
+            db.query(
                 'DELETE  FROM documentary WHERE idSender = ?', id,
                 function (err, rows) {
                     if (err) {
@@ -94,7 +94,7 @@ let handleAddUser = async (req, res) => {
 let getUserById = (id) => {
     return new Promise((resolve, reject) => {
         try {
-            DBConnection.query(
+            db.query(
                 'SELECT * FROM users', id,
                 function (err, rows) {
                     if (err) {
@@ -149,7 +149,7 @@ let handleEditUser = async (req, res) => {
 let updateUserById = (username, password, id) => {
     return new Promise((resolve, reject) => {
         try {
-            DBConnection.query(
+            db.query(
                 'UPDATE users SET username=?,password=? Where id=?', [username, password, id],
                 function (err, rows) {
                     if (err) {

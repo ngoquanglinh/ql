@@ -1,5 +1,6 @@
 import registerService from "./../services/registerService";
 import { validationResult } from "express-validator";
+import db from "./../configs/DBConnection";
 
 let getPageRegister = (req, res) => {
     return res.render("register.ejs", {
@@ -36,17 +37,39 @@ let createNewUser = async (req, res) => {
 };
 let initSystem = async (req, res) => {
     //create a new user
-    let newUser = {
-        username: "systemadmin",
-        email: "systemadmin@gmail.com",
-        password: "123456"
-    };
-    try {
-        await registerService.createNewUser(newUser);
-        res.send("ok");
-    } catch (err) {
-        res.send("error");
-    }
+    // let newUser = {
+    //     username: "systemadmin",
+    //     email: "systemadmin@gmail.com",
+    //     password: "123456"
+    // };
+    // try {
+    //     await registerService.createNewUser(newUser);
+    //     res.send("ok");
+    // } catch (err) {
+    //     res.send("error");
+    // }
+    // return new Promise((resolve, reject) => {
+    //     try {
+    //         var sql = "INSERT INTO clams (name) VALUES ?";
+    //         var claim = [
+    //             ['post'],
+    //             ['put'],
+    //             ['delete'],
+    //             ['get']
+    //         ];
+    //         db.query(
+    //             sql, [claim],
+    //             function (err, rows) {
+    //                 if (err) {
+    //                     res.send(err);
+    //                 }
+    //                 res.send("ok");
+    //             }
+    //         );
+    //     } catch (err) {
+    //         res.send(err);
+    //     }
+    // });
 };
 module.exports = {
     getPageRegister: getPageRegister,

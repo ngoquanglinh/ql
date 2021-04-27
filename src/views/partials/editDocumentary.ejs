@@ -1,0 +1,329 @@
+<!-- The Modal -->
+<div class="modal" id="detailDocumentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 80%" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Sửa công văn</h3>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-8">
+                        <div class="">
+                            <div class="sub-title p-2">Tóm tắt</div>
+                            <div>
+                                <textarea class="form-control" rows="3" value="" id="summaryEdit"></textarea>
+                            </div>
+                        </div>
+                        <div class="">
+                            <div class="sub-title p-2">Tệp đính kèm</div>
+                            <div>
+                                <input type="file" class="form-control-file" value="" id="fileUploadsEdit" multiple>
+                            </div>
+                        </div>
+                        <div class="" id="listImageEdit">
+
+                        </div>
+                        <div class="sub-title p-2">Nội dung</div>
+                        <div>
+                            <textarea cols="10" class="form-control" rows="3" id="contentDocumentaryEdit"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div>
+                            <div class="sub-title p-2">Số văn bản</div>
+                            <input type="text" class="form-control" value="" id="numberDocumentaryEdit"
+                                placeholder="Tên công văn...">
+                        </div>
+                        <div>
+                            <div class="sub-title p-2">Tên văn bản</div>
+                            <div>
+                                <input type="text" class="form-control" id="nameEdit" value=""
+                                    placeholder="Tên công văn...">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="sub-title p-2">Nơi gửi</div>
+                            <div>
+                                <input type="text" class="form-control" id="addressSendingEdit" value=""
+                                    placeholder="Tên công văn...">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="sub-title p-2">Nơi ký</div>
+                            <div>
+                                <input type="text" class="form-control" value="" id="addressSignEdit" value=""
+                                    placeholder="Tên công văn...">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="sub-title p-2">Loại văn bản</div>
+                            <div>
+                                <select class="select-category w-100" value="">
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="sub-title p-2">Người nhận</div>
+                            <div>
+                                <select class="w-100" id="selectUser2" multiple="multiple" value="">
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="sub-title p-2">Ngày tạo</div>
+                            <div>
+                                <input type="text" class="form-control" id="calendarTomorrowEdit" readonly value="">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="sub-title p-2">Ngày hiệu lực</div>
+                            <div>
+                                <input type="text" class="form-control" id="effectiveDateEdit" value="">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="sub-title p-2">Ngày hết hiệu lực</div>
+                            <div>
+                                <input type="text" class="form-control" id="expirationDateEdit" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer mt-1">
+                    <button type="button" class="btn btn-danger" id="deleteDocument" data-dismiss="modal">Xóa</button>
+                    <button type="button" class="btn btn-primary" id="submitDocumentaryEdit">Sửa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // todo : calendar
+        flatpickr('#calendarTomorrowEdit', {
+            "minDate": new Date().fp_incr(1),
+            dateFormat: "d-m-Y",
+            defaultDate: new Date().fp_incr(1),
+            clickOpens: false
+        });
+        flatpickr('#effectiveDateEdit', {
+            "minDate": new Date().fp_incr(1),
+            dateFormat: "d-m-Y",
+        });
+        flatpickr('#expirationDateEdit', {
+            "minDate": new Date().fp_incr(1),
+            dateFormat: "d-m-Y",
+        });
+
+        tinymce.init({
+            selector: '#contentDocumentaryEdit',
+            plugins: 'image media link tinydrive code imagetools paste',
+            toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+            image_title: true,
+            automatic_uploads: true,
+            file_picker_types: 'file image media',
+            images_upload_handler: function (blobInfo, success, failure) {
+                var xhr, formData;
+                xhr = new XMLHttpRequest();
+                xhr.withCredentials = false;
+                xhr.open('POST', '/uploads');
+                xhr.onload = function () {
+                    var json;
+
+                    if (xhr.status != 200) {
+                        failure('HTTP Error: ' + xhr.status);
+                        return;
+                    }
+                    json = JSON.parse(xhr.responseText);
+
+                    if (!json || typeof json.location != 'string') {
+                        failure('Invalid JSON: ' + xhr.responseText);
+                        return;
+                    }
+                    success(json.location);
+                };
+                formData = new FormData();
+                formData.append('file', blobInfo.blob(), blobInfo.filename());
+                xhr.send(formData);
+            },
+        });
+
+        // todo: select users
+        $(window).load(function () {
+            callApi('user', 'Get').then(res => {
+                return res.json();
+            }).then(res => {
+                var data = res.users.map(x => { return { "id": x.id, "text": x.username } });
+                $("#selectUser2").select2({
+                    placeholder: "Người nhận...",
+                    allowClear: true,
+                    data: data,
+                    tags: true,
+                    tokenSeparators: [',', ' ']
+                });
+            })
+        });
+        // todo uploads
+        $("#fileUploadsEdit").change(function () {
+            const formData = new FormData();
+            const file = document.querySelector("#fileUploadsEdit");
+            for (let i = 0; i < file.files.length; i++) {
+                formData.append('files', file.files[i]);
+            }
+            uploads('uploads/multiple', 'POST', formData).then(res => {
+                return res.json();
+            }).then(res => {
+                // let images = res.location.map(x => host + "/" + x.url);
+                let box = $("#listImageEdit");
+                let div = document.createElement("div");
+                div.className = "d-flex";
+                res.location.map(x => {
+                    var link, img;
+                    switch (x.type) {
+                        case "application/msword":
+                            link = document.createElement("a");
+                            img = document.createElement("img");
+                            link.className = "link-upload pointer";
+                            img.className = "image-upload";
+                            link.href = `${host}/${x.url}`;
+                            img.src = `${host}/assets/images/document.png`;
+                            link.appendChild(img);
+                            div.appendChild(link);
+                            break;
+                        case "image/jpeg": case "image/png": case "image/jpg": case "image/jepg": case "image/gif":
+                            img = document.createElement("img");
+                            img.className = "image-upload";
+                            img.src = `${host}/${x.url}`;
+                            div.appendChild(img);
+                            break;
+                    }
+                })
+                box.append(div);
+                box.attr("data-value", encodeURIComponent(JSON.stringify(res.location)))
+            })
+        });
+
+        // todo : edit
+        $(document).on('click', '.detail-document', function () {
+            const data = JSON.parse(decodeURIComponent($(this).attr("data-value")));
+            callApi('documentary/attachments/' + data.idDocumentary, 'Get').then(res => {
+                return res.json();
+            }).then(res => {
+                if (res.success) {
+                    let images = res.items.map(x => host + "/" + "assets/uploads/" + x.url);
+                    let box = $("#listImageEdit");
+                    let div = document.createElement("div");
+                    div.className = "d-flex";
+                    if (images.length > 0) {
+                        images.map(x => {
+                            let img = document.createElement("img");
+                            img.className = "image-upload";
+                            img.src = x;
+                            div.appendChild(img);
+                        })
+                        box.empty();
+                        box.append(div);
+                        box.attr("data-value", encodeURIComponent(JSON.stringify(res.items)));
+                    } else {
+                        box.empty();
+                    }
+                }
+            })
+            callApi('documentary/users/' + data.idDocumentary, 'Get').then(res => {
+                return res.json();
+            }).then(res => {
+                if (res.success) {
+                    const users = res.items.map(x => { return x.id });
+                    $('#selectUser2 option').map(function () {
+                        let id = parseInt($(this).val());
+                        if (users.includes(id)) {
+                            $(this).prop("selected", "selected").trigger('change');
+                        } else {
+                            $(this).removeProp("selected").trigger('change');
+                        }
+                    });
+                }
+            })
+            $("#detailDocumentModal").modal("show");
+            $("#deleteDocument").attr("data-id", data.idDocumentary);
+            $("#submitDocumentaryEdit").attr("data-id", data.idDocumentary);
+            $("#numberDocumentaryEdit").val(data.numberDocumentary);
+            $("#nameEdit").val(data.name);
+            $("#addressSendingEdit").val(data.addressSending);
+            $("#addressSignEdit").val(data.addressSign);
+            $(".select-category").val(data.idcategory);
+            $("#calendarTomorrowEdit").val(moment(data.createdAt).format("DD-MM-YYYY"));
+            $("#effectiveDateEdit").val(moment(data.effectiveDate).format("DD-MM-YYYY"));
+            $("#expirationDateEdit").val(moment(data.expirationDate).format("DD-MM-YYYY"));
+            $("#summaryEdit").val(data.summary);
+            tinymce.get("contentDocumentaryEdit")?.setContent(data.content);
+        });
+
+        //tode : delete documentary
+        $("#deleteDocument").click(function () {
+            swal("Bạn có muốn xóa", "confirm").then(x => {
+                if (x) {
+                    const id = $(this).attr("data-id");
+                    callApi('documentary/' + id, 'Delete').then(res => {
+                        return res.json();
+                    }).then(res => {
+                        if (res.success) {
+                            notify("success", "Xóa thành công");
+                            $("#detailDocumentModal").hide();
+                            $('#detailDocumentModal').removeClass('show');
+                            $('.modal-backdrop').remove();
+                        }
+                    })
+                }
+            })
+        })
+
+        //todo: submit edit
+        $("#submitDocumentaryEdit").click(function () {
+            const numberDocumentary = $("#numberDocumentaryEdit").val();
+            const name = $("#nameEdit").val();
+            const addressSending = $("#addressSendingEdit").val();
+            const addressSign = $("#addressSignEdit").val();
+            const selectCategory = $(".select-category").val();
+            const selectUser = $("#selectUser2").val();
+            const calendarTomorrow = $("#calendarTomorrowEdit").val();
+            const effectiveDate = $("#effectiveDateEdit").val();
+            const expirationDate = $("#expirationDateEdit").val();
+            const summary = $("#summaryEdit").val();
+            var content = tinymce.get("contentDocumentaryEdit").getContent();
+            const dataImage = $("#listImageEdit").attr("data-value");
+            const id = $(this).attr("data-id");
+            var urlImage;
+            if (dataImage) {
+                urlImage = JSON.parse(decodeURIComponent(dataImage));
+            } else {
+                urlImage = [];
+            }
+            const data = {
+                numberDocumentary,
+                name,
+                addressSending,
+                addressSign,
+                selectCategory,
+                selectUser,
+                calendarTomorrow: moment(flatpickr.parseDate(calendarTomorrow, "d/m/Y")).format("YYYY-MM-DD h:mm:ss"),
+                effectiveDate: moment(flatpickr.parseDate(effectiveDate, "d/m/Y")).format("YYYY-MM-DD h:mm:ss"),
+                expirationDate: moment(flatpickr.parseDate(expirationDate, "d/m/Y")).format("YYYY-MM-DD h:mm:ss"),
+                summary,
+                content,
+                urlImage
+            }
+            callApi('documentary/' + id, 'Put', data).then(res => {
+                return res.json();
+            }).then(res => {
+                if (res.success) {
+                    notify("success", "Sửa thành công");
+                    // setTimeout(() => {
+                    //     window.location.href = window.location.href;
+                    // }, 1000);
+                } else {
+                    notify("error", "Sửa không thành công")
+                }
+            }).catch(x => notify("error", "Sửa không thành công"))
+        });
+    </script>

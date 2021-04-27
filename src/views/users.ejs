@@ -41,6 +41,14 @@
                                                         placeholder="Email..." required>
                                                 </div>
                                             </div>
+                                            <div class="">
+                                                <div class="sub-title p-2">Phòng ban</div>
+                                                <div>
+                                                    <select class="w-100" id="selectUserDep" multiple="multiple"
+                                                        value="">
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </form>
                                     </div>
                                     <div class="modal-footer">
@@ -127,23 +135,39 @@
     </div>
 
     <script>
+        $(window).load(function () {
+            callApi('department/lists', 'Get').then(res => {
+                return res.json();
+            }).then(res => {
+                var data = res.items.map(x => { return { "id": x.id, "text": x.name } });
+                $("#selectUserDep").select2({
+                    placeholder: "Phòng ban...",
+                    allowClear: true,
+                    data: data,
+                    tags: true,
+                    tokenSeparators: [',', ' ']
+                });
+            })
+        });
         //tode : delete user
         $(".deleteUser").click(function () {
-            if (window.confirm("Bạn có chắc muốn xóa")) {
-                const id = $(this).attr("attr-id");
-                callApi('user/' + id, 'Delete').then(res => {
-                    return res.json();
-                }).then(res => {
-                    if (res.success) {
-                        notify("success", "Xóa thành công");
-                        // $("#user-row-" + id).remove();
-                        setTimeout(() => {
-                            window.location.href = window.location.href;
-                        }, 1000);
+            swal("Bạn có muốn xóa", "confirm").then(x => {
+                if (x) {
+                    const id = $(this).attr("attr-id");
+                    callApi('user/' + id, 'Delete').then(res => {
+                        return res.json();
+                    }).then(res => {
+                        if (res.success) {
+                            notify("success", "Xóa thành công");
+                            // $("#user-row-" + id).remove();
+                            setTimeout(() => {
+                                window.location.href = window.location.href;
+                            }, 1000);
 
-                    }
-                })
-            }
+                        }
+                    })
+                }
+            })
         })
 
         // todo: add user
@@ -151,31 +175,22 @@
             const username = $("#nameAdd").val();
             const password = $("#passwordAdd").val();
             const email = $("#emailAdd").val();
+            const selectUserDep = $("#selectUserDep").val();
             const data = {
-                username, password, email
+                username, password, email, selectUserDep
             }
-            callApi('user/', 'POST', data).then(res => {
-                return res.json();
-            }).then(res => {
-                if (res.success) {
-                    notify("success", "Thêm thành công");
-                    // const row = '<tr>' +
-                    //     '<td>' + "" + '</td>' +
-                    //     '<td>' + res.user.username + '</td>' +
-                    //     '<td>' + res.user.email + '</td>' +
-                    //     '<td><i class="far fa-trash-alt deleteUser" attr-id="' + res.user.id + '"></i><i class="far fa-edit" attr-id="' + res.user.id + '"></i></td>' +
-                    //     '</tr>';
-                    // $("#table-user").append(row);
-                    setTimeout(() => {
-                        window.location.href = window.location.href;
-                    }, 1000);
-                }
-            })
+            console.log(data);
+            // callApi('user/', 'POST', data).then(res => {
+            //     return res.json();
+            // }).then(res => {
+            //     if (res.success) {
+            //         notify("success", "Thêm thành công");
+            //         setTimeout(() => {
+            //             window.location.href = window.location.href;
+            //         }, 1000);
+            //     }
+            // })
         })
-        // $('#modalAddUser').on('hidden.bs.modal', function (e) {
-        //     alert()
-        // })
-
         // todo: edit user
         function editUser(item) {
             $("#nameEdit").val(item.username);

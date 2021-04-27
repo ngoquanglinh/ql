@@ -24,12 +24,14 @@
     <link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="/assets/js/toastr/toastr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.2/dist/sweetalert2.min.css">
+
+
 </head>
 
 <body>
     <div id="wrapper">
         <%- include("./../partials/header.ejs") %>
-
         <%- include("./../partials/sidebar.ejs") %>
         <%-body%>
         </main>
@@ -58,6 +60,7 @@
 
     <!-- Custom Js -->
     <script src="/assets/js/custom-scripts.js"></script>
+    <!-- <script src="//cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js"></script> -->
 
 
     <!-- Chart Js -->
@@ -84,8 +87,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="/assets/js/toastr/toastr.min.js"></script>
     <script src="/assets/js/toastr.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="/assets/js/message.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.29.2/dist/sweetalert2.min.js"></script>
     <%- script %>
 </body>
 

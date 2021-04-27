@@ -20,3 +20,20 @@ toastr.options = {
 const notify = (status, message) => {
     return toastr[status](message)
 }
+const swal = (title = "", type = "alert") => {
+    if (type == "alert") {
+        return Swal.fire(title);
+    } else {
+        return Swal.fire({
+            title: title,
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: `Xóa`,
+            denyButtonText: `Hủy`
+        }).then(res => {
+            console.log(res);
+            return res.value ? true : false
+        });
+    }
+
+}
