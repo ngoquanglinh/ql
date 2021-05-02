@@ -36,40 +36,37 @@ let createNewUser = async (req, res) => {
     }
 };
 let initSystem = async (req, res) => {
+    var sql = "INSERT INTO clams (name) VALUES ?";
+    var claim = [
+        ['post'],
+        ['put'],
+        ['delete'],
+        ['get'],
+        ['manager'],
+        ['view']
+    ];
+    db.query(
+        sql, [claim],
+        function (err, rows) {
+            if (err) {
+                res.send(err);
+            }
+            res.send("ok");
+        }
+    );
     //create a new user
-    // let newUser = {
-    //     username: "systemadmin",
-    //     email: "systemadmin@gmail.com",
-    //     password: "123456"
-    // };
-    // try {
-    //     await registerService.createNewUser(newUser);
-    //     res.send("ok");
-    // } catch (err) {
-    //     res.send("error");
-    // }
-    // return new Promise((resolve, reject) => {
-    //     try {
-    //         var sql = "INSERT INTO clams (name) VALUES ?";
-    //         var claim = [
-    //             ['post'],
-    //             ['put'],
-    //             ['delete'],
-    //             ['get']
-    //         ];
-    //         db.query(
-    //             sql, [claim],
-    //             function (err, rows) {
-    //                 if (err) {
-    //                     res.send(err);
-    //                 }
-    //                 res.send("ok");
-    //             }
-    //         );
-    //     } catch (err) {
-    //         res.send(err);
-    //     }
-    // });
+    let newUser = {
+        username: "systemadmin",
+        email: "systemadmin@gmail.com",
+        password: "123456"
+    };
+    try {
+        await registerService.createNewUser(newUser);
+        res.send("ok");
+    } catch (err) {
+        res.send("error");
+    }
+
 };
 module.exports = {
     getPageRegister: getPageRegister,

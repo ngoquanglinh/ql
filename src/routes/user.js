@@ -14,6 +14,7 @@ let userRoutes = (app) => {
     router.post("/", loginController.checkLoggedIn, userController.handleAddUser);
     router.get("/list", loginController.checkLoggedIn, userController.handleShowListUser);
     router.put("/", loginController.checkLoggedIn, userController.handleEditUser);
+    router.get("/department/:id", loginController.checkLoggedIn, userController.handleGetDepByUser);
 
     return app.use("/user", router);
 };

@@ -193,13 +193,18 @@ let getRoles = (id) => {
     return new Promise((resolve, reject) => {
         try {
             db.query(
-                `SELECT * FROM roles WHERE 	departmentId = ${id}`,
+                `SELECT * FROM roles WHERE departmentId = ${id}`,
                 function (err, rows) {
                     if (err) reject(err);
                     if (rows.length > 0) {
                         rows.map((x, i) => {
                             db.query(
-                                `SELECT * FROM clams WHERE 	roleId  = ${x.id}`,
+                                `SELECT c.id FROM clams as c 
+                                INNER JOIN rolesclaims as rc
+                                ON rc.idClaim = c.id  
+                                INNER JOIN roles as r
+                                ON rc.idRole = r.id
+                                WHERE r.id = ${x.id}`,
                                 function (err, rows1) {
                                     if (err) reject(err);
                                     x.claims = rows1;
@@ -317,6 +322,90 @@ let getClaim = (id) => {
         }
     });
 };
+
+// todo: edit role claim
+
+let handleEditRoleClaim = async (req, res) => {
+    let items = await editRolesClaims(req.body);
+    if (items) {
+        return res.json({
+            success: true,
+            items
+        })
+    } else {
+        return res.json({
+            success: false,
+            items
+        })
+    }
+
+};
+let editRolesClaims = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const claims = await getClaimsByRole(data.id);
+            const claimsArr = claims.map(x => { return x.idClaim.toString() });
+            const claimsRemove = claims.filter(x => !data.claims.includes(x.idClaim.toString()));
+            if (claimsRemove.length > 0) {
+                const claimsRemoveArr = claimsRemove.map(x => { return [x.idRole, x.idClaim] });
+                await deleteClaimsByRole(claimsRemoveArr);
+            }
+            const claimsCreate = data.claims.filter(x => !claimsArr.includes(x));
+            if (claimsCreate.length > 0) {
+                const claimsCreateArr = claimsCreate.map(x => { return [data.id, x] });
+                await createClaimsByRole(claimsCreateArr);
+            }
+            resolve(claims);
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+let getClaimsByRole = (id) => {
+    return new Promise((resolve, reject) => {
+        try {
+            db.query(
+                `SELECT * FROM rolesclaims r where r.idRole = ${id}`,
+                function (err, rows) {
+                    if (err) reject(err);
+                    resolve(rows);
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+let deleteClaimsByRole = (data) => {
+    return new Promise((resolve, reject) => {
+        try {
+            db.query(
+                `DELETE FROM rolesclaims  where (idRole,idClaim) IN (?)`, [data],
+                function (err, rows) {
+                    if (err) reject(err);
+                    resolve(rows);
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+let createClaimsByRole = (data) => {
+    return new Promise((resolve, reject) => {
+        try {
+            db.query(
+                `INSERT INTO rolesclaims (idRole,idClaim) VALUES ?`, [data],
+                function (err, rows) {
+                    if (err) reject(err);
+                    resolve(rows);
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
 module.exports = {
     handleGetAllDepartments: handleGetAllDepartments,
     handleAddDepart: handleAddDepart,
@@ -327,7 +416,8 @@ module.exports = {
     handleListRoles: handleListRoles,
     handleDeleteRoles: handleDeleteRoles,
     handleEditRoles: handleEditRoles,
-    handleGetListClaim: handleGetListClaim
+    handleGetListClaim: handleGetListClaim,
+    handleEditRoleClaim: handleEditRoleClaim
 };
 
 

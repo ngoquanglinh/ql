@@ -167,7 +167,8 @@ let getDocumentaryById = (id) => {
                 INNER JOIN documentaryuser as du
                 ON d.id = du.idDocumentary
                 INNER JOIN users as u
-                ON u.id = du.iduser`
+                ON u.id = du.iduser
+                WHERE d.id = ${id}`
                 ;
             db.query(
                 sql, id,

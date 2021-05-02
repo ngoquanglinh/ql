@@ -22,6 +22,7 @@ let userRoutes = (app) => {
     router.put("/roles/:id", loginController.checkLoggedIn, departmentController.handleEditRoles);
 
     router.get("/claim", loginController.checkLoggedIn, departmentController.handleGetListClaim);
+    router.post("/role-claim", loginController.checkLoggedIn, departmentController.handleEditRoleClaim);
 
     return app.use("/department", router);
 };

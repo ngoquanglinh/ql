@@ -58,9 +58,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="modal fade" id="modalEditUser" tabindex="-1" role="dialog"
-                            aria-labelledby="myModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
+                        <div class="modal" id="modalEditUser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog" role="document" style="min-width: 80%">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h4>Sửa user</h4>
@@ -70,27 +70,39 @@
                                     <div class="modal-body">
                                         <p id="errorEdit" class="d-none text-danger"></p>
                                         <form>
-                                            <div>
-                                                <div class="sub-title p-2">Tên</div>
-                                                <div>
-                                                    <input type="text" class="form-control" id="nameEdit" value=""
-                                                        placeholder="Tên..." required>
+                                            <div class="row">
+                                                <div class="col-4">
+                                                    <div>
+                                                        <div class="sub-title p-2">Tên</div>
+                                                        <div>
+                                                            <input type="text" class="form-control" id="nameEdit"
+                                                                value="" placeholder="Tên..." required>
+                                                        </div>
+                                                    </div>
+                                                    <!-- <div>
+                                                        <div class="sub-title p-2">Mật khẩu cũ</div>
+                                                        <div>
+                                                            <input type="password" class="form-control"
+                                                                id="oldPasswordEdit" value="" placeholder="Mật khẩu..."
+                                                                required>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="sub-title p-2">Mật khẩu mới</div>
+                                                        <div>
+                                                            <input type="password" class="form-control"
+                                                                id="newPasswordEdit" value=""
+                                                                placeholder="Mật khẩu mới..." required>
+                                                        </div>
+                                                    </div> -->
+                                                </div>
+                                                <div class="col-8">
+                                                    <div id="deparmentUser" class="d-flex justify-content-around">
+
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <div class="sub-title p-2">Mật khẩu cũ</div>
-                                                <div>
-                                                    <input type="password" class="form-control" id="oldPasswordEdit"
-                                                        value="" placeholder="Mật khẩu..." required>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div class="sub-title p-2">Mật khẩu mới</div>
-                                                <div>
-                                                    <input type="password" class="form-control" id="newPasswordEdit"
-                                                        value="" placeholder="Mật khẩu mới..." required>
-                                                </div>
-                                            </div>
+
                                         </form>
                                     </div>
                                     <div class="modal-footer">
@@ -179,33 +191,62 @@
             const data = {
                 username, password, email, selectUserDep
             }
-            console.log(data);
-            // callApi('user/', 'POST', data).then(res => {
-            //     return res.json();
-            // }).then(res => {
-            //     if (res.success) {
-            //         notify("success", "Thêm thành công");
-            //         setTimeout(() => {
-            //             window.location.href = window.location.href;
-            //         }, 1000);
-            //     }
-            // })
+            callApi('user/', 'POST', data).then(res => {
+                return res.json();
+            }).then(res => {
+                if (res.success) {
+                    notify("success", "Thêm thành công");
+                    setTimeout(() => {
+                        window.location.href = window.location.href;
+                    }, 1000);
+                }
+            })
         })
         // todo: edit user
         function editUser(item) {
             $("#nameEdit").val(item.username);
-            $("#submitEditUser").attr("data-id", item.id)
+            $("#submitEditUser").attr("data-id", item.id);
+            callApi('user/department/' + item.id, 'get').then(res => {
+                return res.json();
+            }).then(res => {
+                if (res.success) {
+                    $("#deparmentUser").empty();
+                    res.items.map((x, i) => {
+                        let row = `
+                            <div class="mt-2" >
+                                <div>${x.name}</div>
+                                <div>
+                                    ${x.roles.map((x1, i1) =>
+                            `<div class="d-flex pointer justify-content-betwwen align-items-center">
+                                <div class="checkbox3 checkbox-success checkbox-inline checkbox-check checkbox-round checkbox-light">
+                                    <input type="checkbox" value="${x1.id}" id="checkbox-fa-light-2" ${res.roles.includes(x1.id) && "checked"} >
+                                    <label for="checkbox-fa-light-2">
+                                        ${x1.name}
+                                    </label>
+                                </div>
+                            </div>`
+                        )
+                            }
+                                </div>
+                            </div>`;
+                        $("#deparmentUser").append(row);
+                    })
+                }
+            })
         }
         $("#submitEditUser").click(function () {
             const id = $(this).attr("data-id");
             const item = $(this).attr("attr-data");
             const username = $("#nameEdit").val();
-            const password = $("#oldPasswordEdit").val();
-            const newPassword = $("#newPasswordEdit").val();
+            // const password = $("#oldPasswordEdit").val();
+            // const newPassword = $("#newPasswordEdit").val();
+            var roles = [];
+            $('#deparmentUser :checked').each(function () {
+                roles.push($(this).val());
+            });
             const data = {
-                id, username, password, newPassword
+                id, username, roles
             }
-            console.log(data);
             callApi('user', 'put', data).then(res => {
                 return res.json();
             }).then(res => {

@@ -188,10 +188,10 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" onClick="hideEditRole()"
+                        <button type="button" class="btn btn-default" onClick="hideEditClaims()"
                             data-dismiss="modal">Hủy</button>
-                        <button type="button" class="btn btn-primary" data-id="" id="submitEditRole"
-                            onClick="submitEditRole()">Cập nhật</button>
+                        <button type="button" class="btn btn-primary" data-id="" id="submitEditClaims"
+                            onClick="submitEditClaims()">Cập nhật</button>
                     </div>
                 </div>
             </div>
@@ -275,7 +275,7 @@
                                 `<tr>
                                 <td>${i + 1}</td>
                                 <td class="pointer text-primary"
-                                 onClick="showEditClaim()"">${x.name}</td>
+                                 onClick="showEditClaim(${x.id})"">${x.name}</td>
                                 <td>
                                     <i onClick="deleteRole(${x.id})" class="far fa-trash-alt pointer"/>
                                     <i data-value="${encodeURIComponent(JSON.stringify(x))}"
@@ -367,18 +367,22 @@
                     }
                 })
             }
-            function showEditClaim() {
+            function showEditClaim(id) {
                 $("#modalEditClaim").modal("show");
                 $("#modalListRoles").modal("hide");
+                $("#submitEditClaims").attr("data-id", id);
+                const item = JSON.parse(decodeURIComponent($(`#btnEditRole${id}`).attr("data-value")));
+                const claims = item.claims.map(x => { return x.id });
                 callApi('department/claim', 'get').then(res => {
                     return res.json();
                 }).then(res => {
                     if (res.success) {
+                        $("#listsClaims").empty();
                         res.items.map((x, i) => {
                             let row = `
                                 <div class="d-flex pointer justify-content-betwwen align-items-center">
-                                    <div class="checkbox3 checkbox-success checkbox-inline checkbox-check checkbox-round  checkbox-light">
-                                        <input type="checkbox" id="checkbox-fa-light-2" checked="">
+                                    <div class="checkbox3 checkbox-success checkbox-inline checkbox-check checkbox-round checkbox-light">
+                                        <input type="checkbox" value="${x.id}" id="checkbox-fa-light-2" ${claims.includes(x.id) && "checked"} >
                                         <label for="checkbox-fa-light-2">
                                             ${x.name}
                                         </label>
@@ -387,8 +391,32 @@
                             `;
                             $("#listsClaims").append(row);
                         })
-
                     }
                 })
+            }
+            function submitEditClaims() {
+                const id = $("#submitEditClaims").attr("data-id");
+                var claims = [];
+                $('#listsClaims :checked').each(function () {
+                    claims.push($(this).val());
+                });
+                const data = {
+                    id,
+                    claims
+                }
+                callApi('department/role-claim', 'post', data).then(res => {
+                    return res.json();
+                }).then(res => {
+                    if (res.success) {
+                        notify("success", "Sửa thành công");
+                        $("#modalEditClaim").modal("hide");
+                        setTimeout(() => {
+                            window.location.href = window.location.href;
+                        }, 1000);
+                    }
+                })
+            }
+            function hideEditClaims() {
+                $("#modalEditClaim").modal("hide");
             }
         </script>
