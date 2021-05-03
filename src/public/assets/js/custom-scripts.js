@@ -219,6 +219,11 @@
                 $('#page-wrapper').animate({ 'margin-left': '0px' });
             }
         });
+
+        $("#main-menu li").click(function () {
+            $(this).next(".active-menu").removeClass();
+        });
     });
+
 
 }(jQuery));

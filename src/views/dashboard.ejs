@@ -83,92 +83,101 @@
                                     </div>
                                 </div>
                                 <div class="flex-basis-25">
+                                    <% if(it.type == 1) { %>
                                     <div class="progress mb-0 d-flex align-items-center mr-2">
                                         <div class="progress-bar progress-bar-striped active" role="progressbar"
-                                            aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:40%">
-                                            40%
+                                            aria-valuenow="<%=it.process%>" aria-valuemin="0" aria-valuemax="100"
+                                            style="width:<%=it.process%>%">
+                                            <%=it.process%>%
                                         </div>
                                     </div>
+                                    <%}%>
                                 </div>
                                 <div class="flex-basis-25">
                                     <div class="d-flex align-items-center">
-                                        <button data-toggle="dropdown" class="btn btn-primary" aria-expanded="true">
-                                            trạng thái
-                                        </button>
+                                        <button  class="btn btn-primary" aria-expanded="true">
+                                            <% if(it.status == 0) { %>
+                                    Mới
+                                    <%}else if(it.status == 1){%>
+                                    Chưa xử lý
+                                    <%}else{%>
+                                    Đã xử lý
+                                    <%}%>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
+                                    <% }) %>
                                 </div>
                             </div>
                         </div>
+                        <% }) %>
+                        <div>
+                            <%- include("./partials/editDocumentary.ejs")  %>
+                        </div>
+                        <div>
+                            <%- include("./partials/addDocumentary.ejs")  %>
+                        </div>
+
                     </div>
-                    <% }) %>
-                </div>
-            </div>
-        </div>
-        <% }) %>
-        <div>
-            <%- include("./partials/editDocumentary.ejs")  %>
-        </div>
-        <div>
-            <%- include("./partials/addDocumentary.ejs")  %>
-        </div>
+                    <!-- /. PAGE INNER  -->
+                    <script>
+                        //todo get documentary
+                        $(window).load(function () {
+                            //     $(".panel-user").click(function () {
+                            //         const id = $(this).attr("data-id");
+                            //         const show = $(this).attr("aria-expanded");
+                            //         if (!show) {
+                            //             callApi('documentary/' + id, 'get').then(res => {
+                            //                 return res.json();
+                            //             }).then(res => {
+                            //                 if (res.success) {
+                            //                     var row = '';
+                            //                     res.items.map(x => {
+                            //                         row += `
+                            //                     <div id="documentary-${x.id}" class="detail-document row m-0 panel-body p-2 border-bottom mb-1" data-value="${encodeURIComponent(JSON.stringify(x))}">
+                            //                         <div class="col-6" >
+                            //                             <div class="d-flex justify-content-between h-100 align-items-center">
+                            //                                 <div class="">
+                            //                                     <div class="d-flex align-items-center">${x.name}</div>
+                            //                                 </div>
+                            //                             </div>
+                            //                         </div >
+                            //                         <div class="col-6">
+                            //                             <div class="d-flex justify-content-between h-100 align-items-center">
+                            //                                 <div class="flex-basis-25">
+                            //                                     <div class="d-flex align-items-center">${moment(x.effectiveDate).format("DD-MM-YYYY")}</div>
+                            //                                 </div>
+                            //                                 <div class="flex-basis-25">
+                            //                                     <div class="d-flex align-items-center">${moment(x.expirationDate).format("DD-MM-YYYY")}</div>
+                            //                                 </div>
+                            //                                 <div class="flex-basis-25">
+                            //                                     <div class="progress mb-0 d-flex align-items-center mr-2">
+                            //                                         <div class="progress-bar progress-bar-striped active" role="progressbar"
+                            //                                             aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:40%">
+                            //                                             40%
+                            //                                 </div>
+                            //                                     </div>
+                            //                                 </div>
+                            //                                 <div class="flex-basis-25">
+                            //                                     <div class="d-flex align-items-center">
+                            //                                         <button data-toggle="dropdown" class="btn btn-primary" aria-expanded="true">
+                            //                                         trạng thái 
+                            //                                         </button>
+                            //                                     </div>
+                            //                                 </div>
+                            //                             </div>
+                            //                         </div>
+                            //                     </div >`;
+                            //                         $("#documentaryUser" + id).append(row);
+                            //                         row = "";
+                            //                     })
+                            //                 }
+                            //             })
+                            //         }
+                            //     })
+                        })
 
-    </div>
-    <!-- /. PAGE INNER  -->
-    <script>
-        //todo get documentary
-        $(window).load(function () {
-            //     $(".panel-user").click(function () {
-            //         const id = $(this).attr("data-id");
-            //         const show = $(this).attr("aria-expanded");
-            //         if (!show) {
-            //             callApi('documentary/' + id, 'get').then(res => {
-            //                 return res.json();
-            //             }).then(res => {
-            //                 if (res.success) {
-            //                     var row = '';
-            //                     res.items.map(x => {
-            //                         row += `
-            //                     <div id="documentary-${x.id}" class="detail-document row m-0 panel-body p-2 border-bottom mb-1" data-value="${encodeURIComponent(JSON.stringify(x))}">
-            //                         <div class="col-6" >
-            //                             <div class="d-flex justify-content-between h-100 align-items-center">
-            //                                 <div class="">
-            //                                     <div class="d-flex align-items-center">${x.name}</div>
-            //                                 </div>
-            //                             </div>
-            //                         </div >
-            //                         <div class="col-6">
-            //                             <div class="d-flex justify-content-between h-100 align-items-center">
-            //                                 <div class="flex-basis-25">
-            //                                     <div class="d-flex align-items-center">${moment(x.effectiveDate).format("DD-MM-YYYY")}</div>
-            //                                 </div>
-            //                                 <div class="flex-basis-25">
-            //                                     <div class="d-flex align-items-center">${moment(x.expirationDate).format("DD-MM-YYYY")}</div>
-            //                                 </div>
-            //                                 <div class="flex-basis-25">
-            //                                     <div class="progress mb-0 d-flex align-items-center mr-2">
-            //                                         <div class="progress-bar progress-bar-striped active" role="progressbar"
-            //                                             aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:40%">
-            //                                             40%
-            //                                 </div>
-            //                                     </div>
-            //                                 </div>
-            //                                 <div class="flex-basis-25">
-            //                                     <div class="d-flex align-items-center">
-            //                                         <button data-toggle="dropdown" class="btn btn-primary" aria-expanded="true">
-            //                                         trạng thái 
-            //                                         </button>
-            //                                     </div>
-            //                                 </div>
-            //                             </div>
-            //                         </div>
-            //                     </div >`;
-            //                         $("#documentaryUser" + id).append(row);
-            //                         row = "";
-            //                     })
-            //                 }
-            //             })
-            //         }
-            //     })
-        })
-
-    </script>
+                    </script>

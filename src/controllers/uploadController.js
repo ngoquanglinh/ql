@@ -29,7 +29,6 @@ let upload = (files) => {
                             function (err, rows) {
                                 if (err) reject(err)
                                 arrImage.push(...rows);
-                                console.log(arrImage);
                                 if (index == files.length - 1) resolve(arrImage);
                             }
                         );

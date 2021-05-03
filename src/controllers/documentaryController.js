@@ -114,11 +114,10 @@ let adddDocumentary = (data, userId) => {
     return new Promise((resolve, reject) => {
         try {
             var sql = `INSERT  INTO documentary (name, numberDocumentary,summary,content,idcategory,idSender,addressSending,
-                addressSign,effectiveDate,expirationDate,createdAt) VALUES
+                addressSign,effectiveDate,expirationDate,createdAt,type,status) VALUES
                 ("${data.name} "," ${data.numberDocumentary}","${data.summary}"," 
                  ${data.content}","${data.selectCategory}"," ${userId}","${data.addressSending}
-                ","${data.addressSign}","${data.effectiveDate}","${data.expirationDate}","${data.calendarTomorrow}")`;
-
+                ","${data.addressSign}","${data.effectiveDate}","${data.expirationDate}","${data.calendarTomorrow}","${data.type}",${0})`;
             db.query(
                 sql,
                 function (err, rows) {
@@ -422,7 +421,9 @@ let editDocumentary = (data, id) => {
         try {
             var sql = `UPDATE documentary  SET name = "${data.name}",numberDocumentary="${data.numberDocumentary}",summary="${data.summary}",
                 content="${data.content}",idcategory="${data.selectCategory}",addressSending="${data.addressSending}",addressSign="${data.addressSign}",
-                effectiveDate="${data.effectiveDate}",expirationDate="${data.expirationDate}" WHERE id = ${id}`;
+                effectiveDate="${data.effectiveDate}",expirationDate="${data.expirationDate}",type="${data.type}",status="${data.status}",
+                process="${data.process}"
+                 WHERE id = ${id}`;
             db.query(
                 sql,
                 function (err, rows) {
@@ -446,14 +447,6 @@ let editDocumentary = (data, id) => {
                         );
                     }
                     if (data.urlImage.length > 0) {
-
-                        sql = `DELETE  FROM attachmentsdocumentary WHERE idDocumentary = ${id}`
-                        db.query(
-                            sql,
-                            function (err, rows2) {
-                                if (err) reject(err)
-                            }
-                        );
                         data.urlImage.map((x, index) => {
                             sql = `INSERT INTO attachmentsdocumentary (id,idDocumentary) VALUES ("${x.id}","${id}")`
                             db.query(

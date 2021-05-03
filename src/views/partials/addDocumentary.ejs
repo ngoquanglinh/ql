@@ -67,6 +67,19 @@
                                 <input type="text" class="form-control" id="expirationDate" value="">
                             </div>
                         </div>
+                        <div class="d-flex justify-content-start">
+                            <div class="w-50">
+                                <div class="sub-title p-2">Loại công văn</div>
+                                <select id="selectTypeDocumentaryAdd" class="w-100" value="">
+                                </select>
+                            </div>
+                            <!-- <div class="ml-2 w-50">
+                                <div class="sub-title p-2">Trạng thái</div>
+                                <select id="selectStatusDocumentary" class="w-100" value="">
+
+                                </select>
+                            </div> -->
+                        </div>
                     </div>
                     <div class="col-8">
                         <div class="">
@@ -85,7 +98,7 @@
                         </div>
                         <div>
                             <div class="sub-title p-2">Nội dung</div>
-                            <textarea cols="10" class="form-control" rows="3" id="contentDocumentary"></textarea>
+                            <textarea cols="10" class="form-control" id="contentDocumentary"></textarea>
                         </div>
                     </div>
                 </div>
@@ -146,6 +159,25 @@
                     tokenSeparators: [',', ' ']
                 });
             })
+            var data = [
+                { "id": 0, "text": "Không phản hồi" },
+                { "id": 1, "text": "Có phản hồi" }
+            ];
+            $("#selectTypeDocumentaryAdd").select2({
+                placeholder: "Loại công văn...",
+                minimumResultsForSearch: Infinity,
+                data: data,
+            });
+            var data = [
+                { "id": 0, "text": "Mới" },
+                { "id": 1, "text": "Chưa xử lý" },
+                { "id": 2, "text": "Đã xử lý" }
+            ];
+            $("#selectStatusDocumentary").select2({
+                placeholder: "Trạng thái...",
+                minimumResultsForSearch: Infinity,
+                data: data,
+            });
         });
 
         // todo: categorys
@@ -224,6 +256,7 @@
             const addressSending = $("#addressSending").val();
             const addressSign = $("#addressSign").val();
             const selectCategory = $(".select-category").val();
+            const type = $("#selectTypeDocumentaryAdd").val();
             const selectUser = $("#selectUser1").val();
             const calendarTomorrow = $("#calendar-tomorrow").val();
             const effectiveDate = $("#effectiveDate").val();
@@ -250,7 +283,8 @@
                 expirationDate: moment(flatpickr.parseDate(expirationDate, "d/m/Y")).format("YYYY-MM-DD h:mm:ss"),
                 summary,
                 content,
-                urlImage
+                urlImage,
+                type
             }
             callApi('documentary', 'Post', data).then(res => {
                 return res.json();
@@ -264,4 +298,7 @@
                 }
             }).catch(x => notify("error", "Thêm không thành công"))
         });
+
+        // dropdown
+
     </script>

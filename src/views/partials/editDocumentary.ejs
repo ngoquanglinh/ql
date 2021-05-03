@@ -88,6 +88,25 @@
                                 <input type="text" class="form-control" id="expirationDateEdit" value="">
                             </div>
                         </div>
+                        <div class="d-none" id="processShow">
+                            <div class="sub-title p-2">Tiến trình (%)</div>
+                            <div>
+                                <input type="number" class="form-control" id="process" value="" min="10" max="100">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-start">
+                            <div class="w-50">
+                                <div class="sub-title p-2">Loại công văn</div>
+                                <select id="selectTypeDocumentary" class="w-100" value="">
+                                </select>
+                            </div>
+                            <div class="ml-2 w-50">
+                                <div class="sub-title p-2">Trạng thái</div>
+                                <select id="selectStatusDocumentary" class="w-100" value="">
+
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer mt-1">
@@ -150,6 +169,16 @@
 
         // todo: select users
         $(window).load(function () {
+
+            var data = [
+                { "id": 0, "text": "Không phản hồi" },
+                { "id": 1, "text": "Có phản hồi" }
+            ];
+            $("#selectTypeDocumentary").select2({
+                placeholder: "Loại công văn...",
+                minimumResultsForSearch: Infinity,
+                data: data,
+            });
             callApi('user', 'Get').then(res => {
                 return res.json();
             }).then(res => {
@@ -173,15 +202,15 @@
             uploads('uploads/multiple', 'POST', formData).then(res => {
                 return res.json();
             }).then(res => {
-                // let images = res.location.map(x => host + "/" + x.url);
                 let box = $("#listImageEdit");
                 let div = document.createElement("div");
-                div.className = "d-flex";
+                div.className = "d-flex mt-2";
                 res.location.map(x => {
                     var link, img;
                     switch (x.type) {
-                        case "application/msword":
+                        case "application/msword": case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
                             link = document.createElement("a");
+                            link.setAttribute("download", "true");
                             img = document.createElement("img");
                             link.className = "link-upload pointer";
                             img.className = "image-upload";
@@ -205,6 +234,8 @@
 
         // todo : edit
         $(document).on('click', '.detail-document', function () {
+            $("#processShow").removeAttr('class');
+            $("#processShow").attr('class', 'd-none');
             const data = JSON.parse(decodeURIComponent($(this).attr("data-value")));
             callApi('documentary/attachments/' + data.idDocumentary, 'Get').then(res => {
                 return res.json();
@@ -213,15 +244,31 @@
                     let images = res.items.map(x => host + "/" + "assets/uploads/" + x.url);
                     let box = $("#listImageEdit");
                     let div = document.createElement("div");
-                    div.className = "d-flex";
+                    div.className = "d-flex mt-2";
                     if (images.length > 0) {
-                        images.map(x => {
-                            let img = document.createElement("img");
-                            img.className = "image-upload";
-                            img.src = x;
-                            div.appendChild(img);
-                        })
                         box.empty();
+                        res.items.map(x => {
+                            var link, img;
+                            switch (x.type) {
+                                case "application/msword": case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                                    link = document.createElement("a");
+                                    link.setAttribute("download", "true");
+                                    img = document.createElement("img");
+                                    link.className = "link-upload pointer";
+                                    img.className = "image-upload";
+                                    link.href = `${host}/${x.url}`;
+                                    img.src = `${host}/assets/images/document.png`;
+                                    link.appendChild(img);
+                                    div.appendChild(link);
+                                    break;
+                                case "image/jpeg": case "image/png": case "image/jpg": case "image/jepg": case "image/gif":
+                                    img = document.createElement("img");
+                                    img.className = "image-upload";
+                                    img.src = `${host}/assets/uploads/${x.url}`;
+                                    div.appendChild(img);
+                                    break;
+                            }
+                        })
                         box.append(div);
                         box.attr("data-value", encodeURIComponent(JSON.stringify(res.items)));
                     } else {
@@ -256,7 +303,16 @@
             $("#effectiveDateEdit").val(moment(data.effectiveDate).format("DD-MM-YYYY"));
             $("#expirationDateEdit").val(moment(data.expirationDate).format("DD-MM-YYYY"));
             $("#summaryEdit").val(data.summary);
+            $("#selectTypeDocumentary").val(data.type);
+            $("#selectStatusDocumentary").val(data.status);
             tinymce.get("contentDocumentaryEdit")?.setContent(data.content);
+            $("#selectTypeDocumentary").prop("selected", "selected").trigger('change');
+            $("#selectStatusDocumentary").prop("selected", "selected").trigger('change');
+            if (data.type == 1) {
+                $("#processShow").removeClass("d-none");
+                console.log(data);
+                $("#process").val(data.process);
+            }
         });
 
         //tode : delete documentary
@@ -293,6 +349,9 @@
             var content = tinymce.get("contentDocumentaryEdit").getContent();
             const dataImage = $("#listImageEdit").attr("data-value");
             const id = $(this).attr("data-id");
+            const type = $("#selectTypeDocumentary").val();
+            const status = $("#selectStatusDocumentary").val();
+            const process = $("#process").val() || 0;
             var urlImage;
             if (dataImage) {
                 urlImage = JSON.parse(decodeURIComponent(dataImage));
@@ -311,18 +370,21 @@
                 expirationDate: moment(flatpickr.parseDate(expirationDate, "d/m/Y")).format("YYYY-MM-DD h:mm:ss"),
                 summary,
                 content,
-                urlImage
+                urlImage,
+                type,
+                status,
+                process
             }
             callApi('documentary/' + id, 'Put', data).then(res => {
                 return res.json();
             }).then(res => {
                 if (res.success) {
                     notify("success", "Sửa thành công");
-                    // setTimeout(() => {
-                    //     window.location.href = window.location.href;
-                    // }, 1000);
+                    setTimeout(() => {
+                        window.location.href = window.location.href;
+                    }, 1000);
                 } else {
-                    notify("error", "Sửa không thành công")
+                    notify("error", "Sửa không thành công");
                 }
             }).catch(x => notify("error", "Sửa không thành công"))
         });

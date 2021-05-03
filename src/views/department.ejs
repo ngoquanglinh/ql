@@ -384,7 +384,7 @@
                                     <div class="checkbox3 checkbox-success checkbox-inline checkbox-check checkbox-round checkbox-light">
                                         <input type="checkbox" value="${x.id}" id="checkbox-fa-light-2" ${claims.includes(x.id) && "checked"} >
                                         <label for="checkbox-fa-light-2">
-                                            ${x.name}
+                                            ${convertName(x.name)}
                                         </label>
                                     </div>
                                 </div>
@@ -418,5 +418,27 @@
             }
             function hideEditClaims() {
                 $("#modalEditClaim").modal("hide");
+            }
+            function convertName(name) {
+                switch (name) {
+                    case "post":
+                        return "Thêm";
+                        break;
+                    case "put":
+                        return "Sửa";
+                        break;
+                    case "delete":
+                        return "Xóa";
+                        break;
+                    case "get":
+                        return "Xem";
+                        break;
+                    case "view":
+                        return "Xem tất cả";
+                        break;
+                    default:
+                        return "Quản lý";
+                        break;
+                }
             }
         </script>
