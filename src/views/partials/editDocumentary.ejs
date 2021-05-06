@@ -111,7 +111,9 @@
                 </div>
                 <div class="modal-footer mt-1">
                     <button type="button" class="btn btn-danger" id="deleteDocument" data-dismiss="modal">Xóa</button>
+                    <%if(helpers.hasCap(claims,"manage|put")){%>
                     <button type="button" class="btn btn-primary" id="submitDocumentaryEdit">Sửa</button>
+                    <%}%>
                 </div>
             </div>
         </div>

@@ -8,7 +8,9 @@
                         Danh sách người dùng
                     </h4>
                     <div class="mt-2 d-flex justify-content-end">
+                        <%if(helpers.hasCap(claims,"manage|post")){%>
                         <button class="btn btn-primary" data-toggle="modal" data-target="#modalAddUser">Thêm</button>
+                        <%}%>
                         <div class="modal fade" id="modalAddUser" tabindex="-1" role="dialog"
                             aria-labelledby="myModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
@@ -41,19 +43,21 @@
                                                         placeholder="Email..." required>
                                                 </div>
                                             </div>
-                                            <div class="">
+                                            <!-- <div class="">
                                                 <div class="sub-title p-2">Phòng ban</div>
                                                 <div>
                                                     <select class="w-100" id="selectUserDep" multiple="multiple"
                                                         value="">
                                                     </select>
                                                 </div>
-                                            </div>
+                                            </div> -->
                                         </form>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
-                                        <button type="button" class="btn btn-primary" id="addUser">Thêm</button>
+                                        <%if(helpers.hasCap(claims,"manage|post")){%>
+                        <button type="button" class="btn btn-primary" id="addUser">Thêm</button>
+                        <%}%>
                                     </div>
                                 </div>
                             </div>
@@ -107,8 +111,9 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
-                                        <button type="button" class="btn btn-primary" data-id=""
-                                            id="submitEditUser">Sửa</button>
+                                        <%if(helpers.hasCap(claims,"manage|put")){%>
+                        <button type="button" class="btn btn-primary" data-id="" id="submitEditUser">Sửa</button>
+                        <%}%>
                                     </div>
                                 </div>
                             </div>
@@ -127,138 +132,145 @@
                         </thead>
                         <tbody>
                             <% users.forEach( (item,index) => { %>
-                            <tr id="user-row-<%= item.id %>">
-                                <td><%= index+1 %></td>
-                                <td><%= item.username %></td>
-                                <td><%= item.email %></td>
-                                <td>
-                                    <i class="far fa-trash-alt deleteUser" attr-id="<%= item.id %>"></i>
-                                    <i class="far fa-edit editUser" onclick="editUser(<%= JSON.stringify(item) %>)"
-                                        data-toggle="modal" data-target="#modalEditUser" attr-id="<%= item.id %>"></i>
-                                </td>
-                            </tr>
-                            <% }) %>
+                        <tr id="user-row-<%= item.id %>">
+                            <td><%= index+1 %></td>
+                            <td><%= item.username %></td>
+                            <td><%= item.email %></td>
+                            <td>
+                                <i class="far fa-trash-alt deleteUser" attr-id="<%= item.id %>"></i>
+                                <i class="far fa-edit editUser" onclick="editUser(<%= JSON.stringify(item) %>)"
+                                    data-toggle="modal" data-target="#modalEditUser" attr-id="<%= item.id %>"></i>
+                            </td>
+                        </tr>
+                        <% }) %>
                         </tbody>
-                    </table>
+                        </table>
+                    </div>
                 </div>
+                <!-- /. PAGE INNER  -->
             </div>
-            <!-- /. PAGE INNER  -->
         </div>
-    </div>
 
-    <script>
-        $(window).load(function () {
-            callApi('department/lists', 'Get').then(res => {
-                return res.json();
-            }).then(res => {
-                var data = res.items.map(x => { return { "id": x.id, "text": x.name } });
-                $("#selectUserDep").select2({
-                    placeholder: "Phòng ban...",
-                    allowClear: true,
-                    data: data,
-                    tags: true,
-                    tokenSeparators: [',', ' ']
-                });
+        <script>
+            $(window).load(function () {
+                callApi('department/lists', 'Get').then(res => {
+                    return res.json();
+                }).then(res => {
+                    var data = res.items.map(x => { return { "id": x.id, "text": x.name } });
+                    $("#selectUserDep").select2({
+                        placeholder: "Phòng ban...",
+                        allowClear: true,
+                        data: data,
+                        tags: true,
+                        tokenSeparators: [',', ' ']
+                    });
+                })
+            });
+            //tode : delete user
+            $(".deleteUser").click(function () {
+                swal("Bạn có muốn xóa", "confirm").then(x => {
+                    if (x) {
+                        const id = $(this).attr("attr-id");
+                        callApi('user/' + id, 'Delete').then(res => {
+                            return res.json();
+                        }).then(res => {
+                            if (res.success) {
+                                notify("success", "Xóa thành công");
+                                // $("#user-row-" + id).remove();
+                                setTimeout(() => {
+                                    window.location.href = window.location.href;
+                                }, 1000);
+
+                            }
+                        })
+                    }
+                })
             })
-        });
-        //tode : delete user
-        $(".deleteUser").click(function () {
-            swal("Bạn có muốn xóa", "confirm").then(x => {
-                if (x) {
-                    const id = $(this).attr("attr-id");
-                    callApi('user/' + id, 'Delete').then(res => {
-                        return res.json();
-                    }).then(res => {
-                        if (res.success) {
-                            notify("success", "Xóa thành công");
-                            // $("#user-row-" + id).remove();
-                            setTimeout(() => {
-                                window.location.href = window.location.href;
-                            }, 1000);
 
-                        }
-                    })
+            // todo: add user
+            $("#addUser").click(function () {
+                const username = $("#nameAdd").val();
+                const password = $("#passwordAdd").val();
+                const email = $("#emailAdd").val();
+                // const selectUserDep = $("#selectUserDep").val();
+                const data = {
+                    username, password, email
                 }
+                callApi('user/', 'POST', data).then(res => {
+                    return res.json();
+                }).then(res => {
+                    if (res.success) {
+                        notify("success", "Thêm thành công");
+                        setTimeout(() => {
+                            window.location.href = window.location.href;
+                        }, 1000);
+                    }
+                })
             })
-        })
-
-        // todo: add user
-        $("#addUser").click(function () {
-            const username = $("#nameAdd").val();
-            const password = $("#passwordAdd").val();
-            const email = $("#emailAdd").val();
-            const selectUserDep = $("#selectUserDep").val();
-            const data = {
-                username, password, email, selectUserDep
-            }
-            callApi('user/', 'POST', data).then(res => {
-                return res.json();
-            }).then(res => {
-                if (res.success) {
-                    notify("success", "Thêm thành công");
-                    setTimeout(() => {
-                        window.location.href = window.location.href;
-                    }, 1000);
-                }
-            })
-        })
-        // todo: edit user
-        function editUser(item) {
-            $("#nameEdit").val(item.username);
-            $("#submitEditUser").attr("data-id", item.id);
-            callApi('user/department/' + item.id, 'get').then(res => {
-                return res.json();
-            }).then(res => {
-                if (res.success) {
-                    $("#deparmentUser").empty();
-                    res.items.map((x, i) => {
-                        let row = `
+            // todo: edit user
+            function editUser(item) {
+                $("#nameEdit").val(item.username);
+                $("#submitEditUser").attr("data-id", item.id);
+                callApi('user/department/' + item.id, 'get').then(res => {
+                    return res.json();
+                }).then(res => {
+                    if (res.success) {
+                        $("#deparmentUser").empty();
+                        res.items.map((x, i) => {
+                            let row = `
                             <div class="mt-2" >
                                 <div>${x.name}</div>
                                 <div>
                                     ${x.roles.map((x1, i1) =>
-                            `<div class="d-flex pointer justify-content-betwwen align-items-center">
+                                `<div class="d-flex pointer justify-content-betwwen align-items-center">
                                 <div class="checkbox3 checkbox-success checkbox-inline checkbox-check checkbox-round checkbox-light">
-                                    <input type="checkbox" value="${x1.id}" id="checkbox-fa-light-2" ${res.roles.includes(x1.id) && "checked"} >
+                                    <input type="checkbox" onclick="checkPer(${x.id})" data-value="${x.id}" value="${x1.id}" id="checkbox-fa-light-2" ${res.roles.includes(x1.id) && "checked"} >
                                     <label for="checkbox-fa-light-2">
                                         ${x1.name}
                                     </label>
                                 </div>
                             </div>`
-                        ).join("")
-                            }
+                            ).join("")
+                                }
                                 </div>
                             </div>`;
-                        $("#deparmentUser").append(row);
-                    })
-                }
-            })
-        }
-        $("#submitEditUser").click(function () {
-            const id = $(this).attr("data-id");
-            const item = $(this).attr("attr-data");
-            const username = $("#nameEdit").val();
-            // const password = $("#oldPasswordEdit").val();
-            // const newPassword = $("#newPasswordEdit").val();
-            var roles = [];
-            $('#deparmentUser :checked').each(function () {
-                roles.push($(this).val());
-            });
-            const data = {
-                id, username, roles
+                            $("#deparmentUser").append(row);
+                        })
+                    }
+                })
             }
-            callApi('user', 'put', data).then(res => {
-                return res.json();
-            }).then(res => {
-                if (res.success) {
-                    notify("success", res.message);
-                    setTimeout(() => {
-                        window.location.href = window.location.href;
-                    }, 1000);
-                } else {
-                    $("#errorEdit").removeClass("d-none");
-                    $("#errorEdit").text(res.message);
+            $("#submitEditUser").click(function () {
+                const id = $(this).attr("data-id");
+                const item = $(this).attr("attr-data");
+                const username = $("#nameEdit").val();
+                // const password = $("#oldPasswordEdit").val();
+                // const newPassword = $("#newPasswordEdit").val();
+                var roles = [];
+                $('#deparmentUser :checked').each(function () {
+                    roles.push($(this).val());
+                });
+                const data = {
+                    id, username, roles
                 }
+                callApi('user', 'put', data).then(res => {
+                    return res.json();
+                }).then(res => {
+                    if (res.success) {
+                        notify("success", res.message);
+                        setTimeout(() => {
+                            window.location.href = window.location.href;
+                        }, 1000);
+                    } else {
+                        $("#errorEdit").removeClass("d-none");
+                        $("#errorEdit").text(res.message);
+                    }
+                })
             })
-        })
-    </script>
+            function checkPer(id) {
+                $('#deparmentUser :checked').each(function () {
+                    if ($(this).attr("data-value") != id) {
+                        $(this).prop('checked', false);
+                    }
+                });
+            }
+        </script>

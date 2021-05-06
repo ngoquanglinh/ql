@@ -8,7 +8,9 @@
                         Danh sách phòng ban
                     </h4>
                     <div class="mt-2 d-flex justify-content-end">
+                        <%if(helpers.hasCap(claims,"manage|post")){%>
                         <button class="btn btn-primary" data-toggle="modal" data-target="#modalAddDepart">Thêm</button>
+                        <%}%>
                         <div class="modal" id="modalAddDepart" tabindex="-1" role="dialog"
                             aria-labelledby="myModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
@@ -59,8 +61,10 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
-                                        <button type="button" class="btn btn-primary" data-id=""
-                                            id="submitEditDepart">Sửa</button>
+                                                        <%if(helpers.hasCap(claims,"manage|put")){%>
+                        <button type="button" class="btn btn-primary" data-id="" id="submitEditDepart">Sửa</button>
+                        <%}%>
+                                      
                                     </div>
                                 </div>
                             </div>
@@ -78,201 +82,213 @@
                         </thead>
                         <tbody>
                             <% lists.forEach( (item,index) => { %>
-                            <tr id="user-row-<%= item.id %>">
-                                <td><%= index+1 %></td>
-                                <td class="text-primary pointer" onclick="showRoles(<%= JSON.stringify(item) %>)">
-                                    <%= item.name %></td>
-                                <td>
-                                    <i class="far fa-trash-alt deleteDepart" attr-id="<%= item.id %>"></i>
-                                    <i class="far fa-edit" onclick="editDepart(<%= JSON.stringify(item) %>)"
-                                        data-toggle="modal" data-target="#modalEditDepart" attr-id="<%= item.id %>"></i>
-                                </td>
-                            </tr>
-                            <% }) %>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <!-- /. PAGE INNER  -->
-        </div>
-        <div class="modal" id="modalListRoles" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 id="titleDepart"></h4>
-                    </div>
-                    <div class="modal-body">
-                        <table class="table table-borderless" id="tableRoles">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Tên chức vụ</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal"
-                            onClick="hideListRoles()">Hủy</button>
-                        <button type="button" class="btn btn-primary" onclick="showAddRoles()">Thêm</button>
+                        <tr id="user-row-<%= item.id %>">
+                            <td><%= index+1 %></td>
+                            <td class="text-primary pointer" onclick="showRoles(<%= JSON.stringify(item) %>)">
+                                <%= item.name %></td>
+                            <td>
+                                <%if(helpers.hasCap(claims,"manage|delete")){%>
+                                <i class="far fa-trash-alt deleteDepart" attr-id="<%= item.id %>"></i>
+                                <%}%>
+                                <%if(helpers.hasCap(claims,"manage|delete")){%>
+                                <i class="far fa-edit" onclick="editDepart(<%= JSON.stringify(item) %>)"
+                                    data-toggle="modal" data-target="#modalEditDepart" attr-id="<%= item.id %>"></i>
+                                <%}%>
+                            </td>
+                        </tr>
+                        <% }) %>
+                                </tbody>
+                                </table>
                     </div>
                 </div>
+                <!-- /. PAGE INNER  -->
             </div>
-        </div>
-        <div class="modal" id="modalAddRoles" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4>Thêm chức vụ</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div>
-                            <div class="sub-title p-2">Tên chức vụ</div>
-                            <div>
-                                <input type="text" class="form-control" id="nameRoles" value=""
-                                    placeholder="Tên chức vụ..." required>
-                            </div>
+            <div class="modal" id="modalListRoles" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 id="titleDepart"></h4>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table table-borderless" id="tableRoles">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Tên chức vụ</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal"
+                                onClick="hideListRoles()">Hủy</button>
+                            <%if(helpers.hasCap(claims,"manage|post")){%>
+                            <button type="button" class="btn btn-primary" onclick="showAddRoles()">Thêm</button>
+                            <%}%>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal"
-                            onClick="hideRoles()">Hủy</button>
-                        <button type="button" class="btn btn-primary" id="btnAddRoles" data-id=""
-                            onclick="addRoles()">Thêm</button>
-                    </div>
                 </div>
             </div>
-        </div>
-        <div class="modal" id="modalEditRole" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4>Sửa chức vụ</h4>
-                    </div>
-                    <div class="modal-body">
-                        <form>
+            <div class="modal" id="modalAddRoles" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4>Thêm chức vụ</h4>
+                        </div>
+                        <div class="modal-body">
                             <div>
                                 <div class="sub-title p-2">Tên chức vụ</div>
                                 <div>
-                                    <input type="text" class="form-control" id="nameEditRole" value=""
+                                    <input type="text" class="form-control" id="nameRoles" value=""
                                         placeholder="Tên chức vụ..." required>
                                 </div>
                             </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" onClick="hideEditRole()"
-                            data-dismiss="modal">Hủy</button>
-                        <button type="button" class="btn btn-primary" data-id="" id="submitEditRole"
-                            onClick="submitEditRole()">Sửa</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal" id="modalEditClaim" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4>Phân quyền</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div id="listsClaims">
-
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal"
+                                onClick="hideRoles()">Hủy</button>
+                            <%if(helpers.hasCap(claims,"manage|post")){%>
+                            <button type="button" class="btn btn-primary" id="btnAddRoles" data-id=""
+                                onclick="addRoles()">Thêm</button>
+                            <%}%>
+                            
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" onClick="hideEditClaims()"
-                            data-dismiss="modal">Hủy</button>
-                        <button type="button" class="btn btn-primary" data-id="" id="submitEditClaims"
-                            onClick="submitEditClaims()">Cập nhật</button>
+                </div>
+            </div>
+            <div class="modal" id="modalEditRole" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4>Sửa chức vụ</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div>
+                                    <div class="sub-title p-2">Tên chức vụ</div>
+                                    <div>
+                                        <input type="text" class="form-control" id="nameEditRole" value=""
+                                            placeholder="Tên chức vụ..." required>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" onClick="hideEditRole()"
+                                data-dismiss="modal">Hủy</button>
+                            <%if(helpers.hasCap(claims,"manage|put")){%>
+                            <button type="button" class="btn btn-primary" data-id="" id="submitEditRole"
+                                onClick="submitEditRole()">Sửa</button>
+                            <%}%>
+                          
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <script>
-            //tode : delete user
-            $(".deleteDepart").click(function () {
-                swal("Bạn có muốn xóa", "confirm").then(x => {
-                    if (x) {
-                        const id = $(this).attr("attr-id");
-                        callApi('department/' + id, 'Delete').then(res => {
-                            return res.json();
-                        }).then(res => {
-                            if (res.success) {
-                                notify("success", "Xóa thành công");
-                                setTimeout(() => {
-                                    window.location.href = window.location.href;
-                                }, 1000);
-                            }
-                        })
-                    }
-                })
-            })
-            // todo: add user
-            $("#addDepart").click(function () {
-                const name = $("#nameDepart").val();
-                const data = {
-                    name
-                }
-                callApi('department/', 'POST', data).then(res => {
-                    return res.json();
-                }).then(res => {
-                    if (res.success) {
-                        notify("success", "Thêm thành công");
-                        setTimeout(() => {
-                            window.location.href = window.location.href;
-                        }, 1000);
-                    }
-                })
-            })
-            // todo: edit user
-            function editDepart(item) {
-                $("#nameEdit").val(item.name);
-                $("#submitEditDepart").attr("data-id", item.id)
-            }
-            $("#submitEditDepart").click(function () {
-                const id = $(this).attr("data-id");
-                const item = $(this).attr("attr-data");
-                const name = $("#nameEdit").val();
-                const data = {
-                    id,
-                    name
-                }
-                callApi('department', 'put', data).then(res => {
-                    return res.json();
-                }).then(res => {
-                    if (res.success) {
-                        notify("success", res.message);
-                        setTimeout(() => {
-                            window.location.href = window.location.href;
-                        }, 1000);
-                    } else {
-                        $("#errorEdit").removeClass("d-none");
-                        $("#errorEdit").text(res.message);
-                    }
-                })
-            })
+            <div class="modal" id="modalEditClaim" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4>Phân quyền</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div id="listsClaims">
 
-            // todo : add roles
-            function showRoles(item) {
-                $("#btnAddRoles").attr("data-id", item.id);
-                $("#modalListRoles").modal("show");
-                $("#titleDepart").text(item.name);
-                callApi('department/roles/' + item.id, 'get').then(res => {
-                    return res.json();
-                }).then(res => {
-                    if (res.success) {
-                        $("#tableRoles > tbody").empty();
-                        res.items.map((x, i) => {
-                            let row =
-                                `<tr>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" onClick="hideEditClaims()"
+                                data-dismiss="modal">Hủy</button>
+                            <button type="button" class="btn btn-primary" data-id="" id="submitEditClaims"
+                                onClick="submitEditClaims()">Cập nhật</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                //tode : delete user
+                $(".deleteDepart").click(function () {
+                    swal("Bạn có muốn xóa", "confirm").then(x => {
+                        if (x) {
+                            const id = $(this).attr("attr-id");
+                            callApi('department/' + id, 'Delete').then(res => {
+                                return res.json();
+                            }).then(res => {
+                                if (res.success) {
+                                    notify("success", "Xóa thành công");
+                                    setTimeout(() => {
+                                        window.location.href = window.location.href;
+                                    }, 1000);
+                                }
+                            })
+                        }
+                    })
+                })
+                // todo: add user
+                $("#addDepart").click(function () {
+                    const name = $("#nameDepart").val();
+                    const data = {
+                        name
+                    }
+                    callApi('department/', 'POST', data).then(res => {
+                        return res.json();
+                    }).then(res => {
+                        if (res.success) {
+                            notify("success", "Thêm thành công");
+                            setTimeout(() => {
+                                window.location.href = window.location.href;
+                            }, 1000);
+                        }
+                    })
+                })
+                // todo: edit user
+                function editDepart(item) {
+                    $("#nameEdit").val(item.name);
+                    $("#submitEditDepart").attr("data-id", item.id)
+                }
+                $("#submitEditDepart").click(function () {
+                    const id = $(this).attr("data-id");
+                    const item = $(this).attr("attr-data");
+                    const name = $("#nameEdit").val();
+                    const data = {
+                        id,
+                        name
+                    }
+                    callApi('department', 'put', data).then(res => {
+                        return res.json();
+                    }).then(res => {
+                        if (res.success) {
+                            notify("success", res.message);
+                            setTimeout(() => {
+                                window.location.href = window.location.href;
+                            }, 1000);
+                        } else {
+                            $("#errorEdit").removeClass("d-none");
+                            $("#errorEdit").text(res.message);
+                        }
+                    })
+                })
+
+                // todo : add roles
+                function showRoles(item) {
+                    $("#btnAddRoles").attr("data-id", item.id);
+                    $("#modalListRoles").modal("show");
+                    $("#titleDepart").text(item.name);
+                    callApi('department/roles/' + item.id, 'get').then(res => {
+                        return res.json();
+                    }).then(res => {
+                        if (res.success) {
+                            $("#tableRoles > tbody").empty();
+                            res.items.map((x, i) => {
+                                let row =
+                                    `<tr>
                                 <td>${i + 1}</td>
                                 <td class="pointer text-primary"
                                  onClick="showEditClaim(${x.id})"">${x.name}</td>
@@ -283,103 +299,103 @@
                                     onClick="editRole(${x.id})" class="far fa-edit pointer"/>
                                 </td>
                             </tr>`;
-                            $("#tableRoles > tbody").append(row);
-                        })
-                    }
-                })
-            }
-            function showAddRoles() {
-                $("#modalAddRoles").modal("show");
-                $("#modalListRoles").modal("hide");
-            }
-            function hideRoles() {
-                $("#modalAddRoles").modal("hide");
-            }
-            function hideListRoles() {
-                $("#modalListRoles").modal("hide");
-            }
-            function addRoles() {
-                const name = $("#nameRoles").val();
-                const departmentId = $("#btnAddRoles").attr("data-id");
-                const data = {
-                    name, departmentId
+                                $("#tableRoles > tbody").append(row);
+                            })
+                        }
+                    })
                 }
-                callApi('department/roles', 'post', data).then(res => {
-                    return res.json();
-                }).then(res => {
-                    if (res.success) {
-                        notify("success", "Thêm thành công");
-                        $("#modalAddRoles").modal("hide");
-                        setTimeout(() => {
-                            window.location.href = window.location.href;
-                        }, 1000);
-                    } else {
-                        $("#modalAddRoles").modal("hide");
+                function showAddRoles() {
+                    $("#modalAddRoles").modal("show");
+                    $("#modalListRoles").modal("hide");
+                }
+                function hideRoles() {
+                    $("#modalAddRoles").modal("hide");
+                }
+                function hideListRoles() {
+                    $("#modalListRoles").modal("hide");
+                }
+                function addRoles() {
+                    const name = $("#nameRoles").val();
+                    const departmentId = $("#btnAddRoles").attr("data-id");
+                    const data = {
+                        name, departmentId
                     }
-                })
-            }
+                    callApi('department/roles', 'post', data).then(res => {
+                        return res.json();
+                    }).then(res => {
+                        if (res.success) {
+                            notify("success", "Thêm thành công");
+                            $("#modalAddRoles").modal("hide");
+                            setTimeout(() => {
+                                window.location.href = window.location.href;
+                            }, 1000);
+                        } else {
+                            $("#modalAddRoles").modal("hide");
+                        }
+                    })
+                }
 
-            function deleteRole(id) {
-                swal("Bạn có muốn xóa", "confirm").then(x => {
-                    if (x) {
-                        callApi('department/roles/' + id, 'delete').then(res => {
-                            return res.json();
-                        }).then(res => {
-                            if (res.success) {
-                                notify("success", "Xóa thành công");
-                                setTimeout(() => {
-                                    window.location.href = window.location.href;
-                                }, 1000);
-                            } else {
-                                notify("error", "Xóa không thành công");
-                            }
-                        })
-                    }
-                })
-            }
-            function editRole(id) {
-                hideListRoles();
-                $("#modalEditRole").modal("show");
-                const item = JSON.parse(decodeURIComponent($(`#btnEditRole${id}`).attr("data-value")));
-                $("#submitEditRole").attr("data-id", item.id);
-                $("#nameEditRole").val(item.name);
-            }
-            function hideEditRole() {
-                $("#modalEditRole").modal("hide");
-            }
-            function submitEditRole() {
-                const name = $("#nameEditRole").val();
-                const id = $("#submitEditRole").attr("data-id");
-                const data = {
-                    name
+                function deleteRole(id) {
+                    swal("Bạn có muốn xóa", "confirm").then(x => {
+                        if (x) {
+                            callApi('department/roles/' + id, 'delete').then(res => {
+                                return res.json();
+                            }).then(res => {
+                                if (res.success) {
+                                    notify("success", "Xóa thành công");
+                                    setTimeout(() => {
+                                        window.location.href = window.location.href;
+                                    }, 1000);
+                                } else {
+                                    notify("error", "Xóa không thành công");
+                                }
+                            })
+                        }
+                    })
                 }
-                callApi('department/roles/' + id, 'put', data).then(res => {
-                    return res.json();
-                }).then(res => {
-                    if (res.success) {
-                        notify("success", "Sửa thành công");
-                        $("#modalEditRole").modal("hide");
-                        setTimeout(() => {
-                            window.location.href = window.location.href;
-                        }, 1000);
-                    } else {
-                        $("#modalEditRole").modal("hide");
+                function editRole(id) {
+                    hideListRoles();
+                    $("#modalEditRole").modal("show");
+                    const item = JSON.parse(decodeURIComponent($(`#btnEditRole${id}`).attr("data-value")));
+                    $("#submitEditRole").attr("data-id", item.id);
+                    $("#nameEditRole").val(item.name);
+                }
+                function hideEditRole() {
+                    $("#modalEditRole").modal("hide");
+                }
+                function submitEditRole() {
+                    const name = $("#nameEditRole").val();
+                    const id = $("#submitEditRole").attr("data-id");
+                    const data = {
+                        name
                     }
-                })
-            }
-            function showEditClaim(id) {
-                $("#modalEditClaim").modal("show");
-                $("#modalListRoles").modal("hide");
-                $("#submitEditClaims").attr("data-id", id);
-                const item = JSON.parse(decodeURIComponent($(`#btnEditRole${id}`).attr("data-value")));
-                const claims = item.claims.map(x => { return x.id });
-                callApi('department/claim', 'get').then(res => {
-                    return res.json();
-                }).then(res => {
-                    if (res.success) {
-                        $("#listsClaims").empty();
-                        res.items.map((x, i) => {
-                            let row = `
+                    callApi('department/roles/' + id, 'put', data).then(res => {
+                        return res.json();
+                    }).then(res => {
+                        if (res.success) {
+                            notify("success", "Sửa thành công");
+                            $("#modalEditRole").modal("hide");
+                            setTimeout(() => {
+                                window.location.href = window.location.href;
+                            }, 1000);
+                        } else {
+                            $("#modalEditRole").modal("hide");
+                        }
+                    })
+                }
+                function showEditClaim(id) {
+                    $("#modalEditClaim").modal("show");
+                    $("#modalListRoles").modal("hide");
+                    $("#submitEditClaims").attr("data-id", id);
+                    const item = JSON.parse(decodeURIComponent($(`#btnEditRole${id}`).attr("data-value")));
+                    const claims = item.claims.map(x => { return x.id });
+                    callApi('department/claim', 'get').then(res => {
+                        return res.json();
+                    }).then(res => {
+                        if (res.success) {
+                            $("#listsClaims").empty();
+                            res.items.map((x, i) => {
+                                let row = `
                                 <div class="d-flex pointer justify-content-betwwen align-items-center">
                                     <div class="checkbox3 checkbox-success checkbox-inline checkbox-check checkbox-round checkbox-light">
                                         <input type="checkbox" value="${x.id}" id="checkbox-fa-light-2" ${claims.includes(x.id) && "checked"} >
@@ -389,56 +405,56 @@
                                     </div>
                                 </div>
                             `;
-                            $("#listsClaims").append(row);
-                        })
-                    }
-                })
-            }
-            function submitEditClaims() {
-                const id = $("#submitEditClaims").attr("data-id");
-                var claims = [];
-                $('#listsClaims :checked').each(function () {
-                    claims.push($(this).val());
-                });
-                const data = {
-                    id,
-                    claims
+                                $("#listsClaims").append(row);
+                            })
+                        }
+                    })
                 }
-                callApi('department/role-claim', 'post', data).then(res => {
-                    return res.json();
-                }).then(res => {
-                    if (res.success) {
-                        notify("success", "Sửa thành công");
-                        $("#modalEditClaim").modal("hide");
-                        setTimeout(() => {
-                            window.location.href = window.location.href;
-                        }, 1000);
+                function submitEditClaims() {
+                    const id = $("#submitEditClaims").attr("data-id");
+                    var claims = [];
+                    $('#listsClaims :checked').each(function () {
+                        claims.push($(this).val());
+                    });
+                    const data = {
+                        id,
+                        claims
                     }
-                })
-            }
-            function hideEditClaims() {
-                $("#modalEditClaim").modal("hide");
-            }
-            function convertName(name) {
-                switch (name) {
-                    case "post":
-                        return "Thêm";
-                        break;
-                    case "put":
-                        return "Sửa";
-                        break;
-                    case "delete":
-                        return "Xóa";
-                        break;
-                    case "get":
-                        return "Xem";
-                        break;
-                    case "view":
-                        return "Xem tất cả";
-                        break;
-                    default:
-                        return "Quản lý";
-                        break;
+                    callApi('department/role-claim', 'post', data).then(res => {
+                        return res.json();
+                    }).then(res => {
+                        if (res.success) {
+                            notify("success", "Sửa thành công");
+                            $("#modalEditClaim").modal("hide");
+                            setTimeout(() => {
+                                window.location.href = window.location.href;
+                            }, 1000);
+                        }
+                    })
                 }
-            }
-        </script>
+                function hideEditClaims() {
+                    $("#modalEditClaim").modal("hide");
+                }
+                function convertName(name) {
+                    switch (name) {
+                        case "post":
+                            return "Thêm";
+                            break;
+                        case "put":
+                            return "Sửa";
+                            break;
+                        case "delete":
+                            return "Xóa";
+                            break;
+                        case "get":
+                            return "Xem";
+                            break;
+                        case "view":
+                            return "Xem tất cả";
+                            break;
+                        default:
+                            return "Quản lý";
+                            break;
+                    }
+                }
+            </script>

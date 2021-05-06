@@ -2,23 +2,19 @@
     <div class="sidebar-collapse">
         <ul class="nav" id="main-menu">
             <li>
-                <a class="active-menu" href="/"><i class="fa fa-dashboard"></i>Trang chủ</a>
+                <a class="active-menu" href="/"><i class="fa fa-dashboard"></i>
+                    Trang chủ
+                </a>
             </li>
+            <%if(helpers.hasCap(claims,"manage")){%>
             <li>
                 <a href="/user/list"><i class="fa fa-desktop"></i>Người dùng</a>
             </li>
+            <%}%>
 
             <li>
                 <a href="/documentary/category"><i class="fa fa-sitemap"></i>Danh mục công văn
                 </a>
-                <!-- <ul class="nav nav-second-level">
-                    <li>
-                        <a href="chart.html">Charts JS</a>
-                    </li>
-                    <li>
-                        <a href="morris-chart.html">Morris Chart</a>
-                    </li>
-                </ul> -->
             </li>
             <li>
                 <a href="/department"><i class="fa fa-desktop"></i>Phòng ban</a>

@@ -3,19 +3,17 @@ import bcrypt from "bcryptjs";
 
 let handleLogin = (email, password) => {
     return new Promise(async (resolve, reject) => {
-        //check email is exist or not
         let user = await findUserByEmail(email);
         if (user) {
-            //compare password
             await bcrypt.compare(password, user.password).then((isMatch) => {
                 if (isMatch) {
                     resolve(true);
                 } else {
-                    reject(`The password that you've entered is incorrect`);
+                    reject(`Mật khẩu không chính xác`);
                 }
             });
         } else {
-            reject(`This user email "${email}" doesn't exist`);
+            reject(`Email "${email}" không tồn tại`);
         }
     });
 };

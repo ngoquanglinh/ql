@@ -2,9 +2,11 @@ import db from "./../configs/DBConnection";
 var helpers = require('./../lib/helpers');
 const socket = require('./../server');
 var moment = require('moment');
-// render dasboard
+import { checkAuth } from "./../validation/auth";
+
 let handleDasboard = async (req, res) => {
-    let lists = await getUserBydocumentary();
+    let lists = await getUserBydocumentary(req.user);
+    const claims = await getClaims(req.user.id);
     return res.render("dashboard", {
         layout: "layouts/main.ejs",
         extractScripts: true,
@@ -12,14 +14,54 @@ let handleDasboard = async (req, res) => {
         title: "dashboard",
         lists,
         helpers,
-        moment: moment
+        moment: moment,
+        claims
     });
 };
-let getUserBydocumentary = () => {
+
+let getClaims = (id) => {
     return new Promise((resolve, reject) => {
         try {
             db.query(
-                `SELECT * , id as idSender FROM users`,
+                `SELECT ur.roleId FROM user_roles as ur where ur.userId = ${id}`,
+                function (err, rows) {
+                    if (err) reject(err);
+                    if (rows.length > 0) {
+                        rows = rows.map(x => { return x.roleId });
+                        rows.map((item, index) => {
+                            db.query(
+                                `SELECT *,c.name  FROM rolesclaims as rc
+                    INNER JOIN clams as c ON rc.idClaim = c.id
+                    where rc.idRole = ${item}`,
+                                function (err, rows1) {
+                                    if (err) reject(err);
+                                    if (index == rows.length - 1) resolve(rows1);
+                                }
+                            );
+                        });
+                    } else {
+                        resolve([]);
+                    }
+
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+let getUserBydocumentary = (user) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const check = await checkAuth(user, "manage");
+            let sql = "";
+            if (check) {
+                sql = `SELECT * , id as idSender FROM users`;
+            } else {
+                sql = `SELECT * , id as idSender FROM users Where id =${user.id}`;
+            }
+            db.query(
+                sql,
                 function (err, rows) {
                     if (err) reject(err);
                     var data = rows;
@@ -185,11 +227,14 @@ let getDocumentaryById = (id) => {
 // todo: show category
 let showCategory = async (req, res) => {
     let users = await getAllCategory();
+    const claims = await getClaims(req.user.id);
     return res.render("category", {
         layout: "layouts/main.ejs",
         extractScripts: true,
         title: "category",
-        users
+        users,
+        helpers,
+        claims
     });
 };
 let getAllCategory = () => {

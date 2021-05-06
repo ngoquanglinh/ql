@@ -1,6 +1,7 @@
 import db from "./../configs/DBConnection";
 import registerService from "../services/registerService";
 import bcrypt from "bcryptjs";
+var helpers = require('./../lib/helpers');
 // todo get all users
 let handleGetAllDepartmentsLists = async (req, res) => {
     let items = await getAllDepartments();
@@ -30,14 +31,47 @@ let getAllDepartments = () => {
 // todo get all phong ban
 let handleGetAllDepartments = async (req, res) => {
     let lists = await getAllDepartments();
+    const claims = await getClaims(req.user.id);
     return res.render("department", {
         layout: "layouts/main.ejs",
         extractScripts: true,
         title: "department",
-        lists
+        lists,
+        helpers,
+        claims
     });
 };
+let getClaims = (id) => {
+    return new Promise((resolve, reject) => {
+        try {
+            db.query(
+                `SELECT ur.roleId FROM user_roles as ur where ur.userId = ${id}`,
+                function (err, rows) {
+                    if (err) reject(err);
+                    if (rows.length > 0) {
+                        rows = rows.map(x => { return x.roleId });
+                        rows.map((item, index) => {
+                            db.query(
+                                `SELECT *,c.name  FROM rolesclaims as rc
+                    INNER JOIN clams as c ON rc.idClaim = c.id
+                    where rc.idRole = ${item}`,
+                                function (err, rows1) {
+                                    if (err) reject(err);
+                                    if (index == rows.length - 1) resolve(rows1);
+                                }
+                            );
+                        });
+                    } else {
+                        resolve([]);
+                    }
 
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
 // todo: delete phong ban
 let handleDeleteDepart = async (req, res) => {
     await deleteDepart(req.params.id);
@@ -170,7 +204,6 @@ let addRoles = (data) => {
                     if (err) {
                         reject(err)
                     }
-                    console.log(rows);
                     resolve(rows);
                 }
             );
@@ -183,7 +216,6 @@ let addRoles = (data) => {
 // todo: get roles
 let handleListRoles = async (req, res) => {
     let items = await getRoles(req.params.id);
-    console.log(items);
     return res.json({
         success: true,
         items

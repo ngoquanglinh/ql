@@ -14,7 +14,7 @@ let initPassportLocal = () => {
             try {
                 await loginService.findUserByEmail(email).then(async (user) => {
                     if (!user) {
-                        return done(null, false, req.flash("errors", `This user email "${email}" doesn't exist`));
+                        return done(null, false, req.flash("errors", `Email ${email} không tồn tại`));
                     }
                     if (user) {
                         let match = await loginService.comparePassword(password, user);
@@ -35,7 +35,6 @@ let initPassportLocal = () => {
 };
 
 passport.serializeUser((user, done) => {
-    console.log(user);
     done(null, user.id);
 });
 

@@ -1,6 +1,7 @@
 import db from "./../configs/DBConnection";
 import registerService from "../services/registerService";
 import bcrypt from "bcryptjs";
+var helpers = require('./../lib/helpers');
 // todo get all users
 let handleGetAllUser = async (req, res) => {
     let users = await getAllUser();
@@ -26,15 +27,48 @@ let getAllUser = () => {
         }
     });
 };
+let getClaims = (id) => {
+    return new Promise((resolve, reject) => {
+        try {
+            db.query(
+                `SELECT ur.roleId FROM user_roles as ur where ur.userId = ${id}`,
+                function (err, rows) {
+                    if (err) reject(err);
+                    if (rows.length > 0) {
+                        rows = rows.map(x => { return x.roleId });
+                        rows.map((item, index) => {
+                            db.query(
+                                `SELECT *,c.name  FROM rolesclaims as rc
+                    INNER JOIN clams as c ON rc.idClaim = c.id
+                    where rc.idRole = ${item}`,
+                                function (err, rows1) {
+                                    if (err) reject(err);
+                                    if (index == rows.length - 1) resolve(rows1);
+                                }
+                            );
+                        });
+                    } else {
+                        resolve([]);
+                    }
 
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
 // todo get all users
 let handleShowListUser = async (req, res) => {
     let users = await getAllUser();
+    const claims = await getClaims(req.user.id);
     return res.render("users", {
         layout: "layouts/main.ejs",
         extractScripts: true,
         title: "users",
-        users
+        users,
+        helpers,
+        claims
     });
 };
 
@@ -88,8 +122,7 @@ let handleAddUser = async (req, res) => {
     const user = await getUserById(result.insertId);
     return res.json({
         success: true,
-        user,
-        departments
+        user
     })
 };
 let getUserById = (id) => {
