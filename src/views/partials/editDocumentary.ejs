@@ -10,6 +10,11 @@
                 <div class="row">
                     <div class="col-8">
                         <div class="">
+                            <div class="sub-title p-2">Danh sách thẻ</div>
+                            <div id="listTagsEdit" class="d-flex flex-wrap">
+                            </div>
+                        </div>
+                        <div class="">
                             <div class="sub-title p-2">Tóm tắt</div>
                             <div>
                                 <textarea class="form-control" rows="3" value="" id="summaryEdit"></textarea>
@@ -94,6 +99,12 @@
                                 <input type="number" class="form-control" id="process" value="" min="10" max="100">
                             </div>
                         </div>
+                        <div>
+                            <div class="sub-title p-2">Thẻ</div>
+                            <div>
+                                <button type="button" onclick="openTags()" class="btn btn-secondary w-100">Thẻ</button>
+                            </div>
+                        </div>
                         <div class="d-flex justify-content-start">
                             <div class="w-50">
                                 <div class="sub-title p-2">Loại công văn</div>
@@ -109,8 +120,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer mt-1">
+                <div class="modal-footer mt-1" id="dataIdDocument">
+                    <%if(helpers.hasCap(claims,"manage|delete")){%>
                     <button type="button" class="btn btn-danger" id="deleteDocument" data-dismiss="modal">Xóa</button>
+                    <%}%>
                     <%if(helpers.hasCap(claims,"manage|put")){%>
                     <button type="button" class="btn btn-primary" id="submitDocumentaryEdit">Sửa</button>
                     <%}%>
@@ -118,7 +131,20 @@
             </div>
         </div>
     </div>
+    <div class="modal" id="modalAssignTags" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>Danh Sách Thẻ</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="listTagsAssign">
 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         // todo : calendar
         flatpickr('#calendarTomorrowEdit', {
@@ -276,6 +302,7 @@
                     } else {
                         box.empty();
                     }
+                    // listTagsEdit
                 }
             })
             callApi('documentary/users/' + data.idDocumentary, 'Get').then(res => {
@@ -295,6 +322,7 @@
             })
             $("#detailDocumentModal").modal("show");
             $("#deleteDocument").attr("data-id", data.idDocumentary);
+            $("#dataIdDocument").attr("data-id", data.idDocumentary);
             $("#submitDocumentaryEdit").attr("data-id", data.idDocumentary);
             $("#numberDocumentaryEdit").val(data.numberDocumentary);
             $("#nameEdit").val(data.name);
@@ -315,6 +343,26 @@
                 console.log(data);
                 $("#process").val(data.process);
             }
+
+            callApi('tags/tags-documentary/' + data.idDocumentary, 'Get').then(res => {
+                return res.json();
+            }).then(res => {
+                if (res.success) {
+                    $("#listTagsEdit").empty();
+                    if (res.items.length > 0) {
+                        let row = '';
+                        res.items.map((x) => {
+                            row = `<div data-id="${x.id}" class="rounded items-assign border align-items-center d-flex text-center justify-content-center text-white p-2 pointer mb-1" style="background-color:${x.code}">
+                                    <div>${x.name}</div>
+                                <div>
+                                `;
+                            $("#listTagsEdit").append(row);
+                        });
+                    } else {
+                        $("#listTagsEdit").empty();
+                    }
+                }
+            })
         });
 
         //tode : delete documentary
@@ -377,6 +425,7 @@
                 status,
                 process
             }
+
             callApi('documentary/' + id, 'Put', data).then(res => {
                 return res.json();
             }).then(res => {
@@ -389,5 +438,64 @@
                     notify("error", "Sửa không thành công");
                 }
             }).catch(x => notify("error", "Sửa không thành công"))
+        });
+
+        function openTags() {
+            $("#modalAssignTags").modal("show");
+            const id = $("#dataIdDocument").attr("data-id");
+            // listTagsAssign
+            callApi('tags/tags-documentary/' + id, 'get').then(res => {
+                return res.json();
+            }).then(res => {
+                let tags = res.items.map(x => { return x.idTag });
+                callApi('tags/list', 'get').then(res => {
+                    return res.json();
+                }).then(res => {
+                    if (res.success) {
+                        $("#listTagsAssign").empty();
+                        if (res.items.length > 0) {
+                            let row = '';
+                            res.items.map((x) => {
+                                row = `<div data-id="${x.id}" class="items-assign border align-items-center d-flex text-center justify-content-center text-white p-2 pointer mb-1" style="background-color:${x.code}">
+                                    <div>${x.name}</div>
+                                    ${tags.includes(x.id) ? "<i class='ml-2 fa fa-check'></i>" : ""}
+                                <div>
+                                `;
+                                $("#listTagsAssign").append(row);
+                            });
+                        }
+                    }
+                }).catch(x => console.log(x))
+
+            })
+        }
+        $(document).on("click", ".items-assign", function () {
+            const idTag = $(this).attr("data-id");
+            const idDocumentary = $("#dataIdDocument").attr("data-id");
+            const data = { idTag, idDocumentary };
+            if ($(this).children("i").length > 0) {
+                callApi(`tags/tags-documentary/${idTag}/${idDocumentary}`, 'delete').then(res => {
+                    return res.json();
+                }).then(res => {
+                    if (res.success) {
+                        $(this).children("i").remove();
+                        $("#listTagsEdit").find(`[data-id='${res.items.id}']`).remove();
+                    }
+                })
+            } else {
+                callApi('tags/tags-documentary', 'post', data).then(res => {
+                    return res.json();
+                }).then(res => {
+                    if (res.success) {
+                        $(this).append("<i class='ml-2 fa fa-check'></i>");
+                        const row = `<div data-id="${res.items.id}" 
+                        class="rounded items-assign border align-items-center d-flex text-center justify-content-center text-white p-2 pointer mb-1" style="background-color:${res.items.code}">
+                                    <div>${res.items.name}</div>
+                                <div>
+                                `;
+                        $("#listTagsEdit").append(row);
+                    }
+                })
+            }
         });
     </script>

@@ -38,3 +38,6 @@
   align-items: center;
   font-weight: bold;
 }
+.minicolors-theme-default .minicolors-input {
+  height: 30px !important;
+}

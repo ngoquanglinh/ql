@@ -62,3 +62,17 @@ socket.on("documentary", function ({ action, data }) {
     }
 })
 
+
+socket.on("tags", function ({ action, data }) {
+    if (action == "recives") {
+        const row = `
+            <div data-id=${data.items.id} class="p-2 ml-2 rounded pointer text-white"
+                style="background-color:${data.items.code}">
+                ${data.items.name}
+            </div>
+        `;
+        $(`#documentary-${data.params.idDocumentary} .home-list-tags`).append(row);
+    } else {
+        $(`#documentary-${data.params.idDocumentary} .home-list-tags`).find(`[data-id='${data.items.id}']`).remove();
+    }
+})

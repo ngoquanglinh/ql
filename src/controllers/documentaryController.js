@@ -15,7 +15,7 @@ let handleDasboard = async (req, res) => {
         lists,
         helpers,
         moment: moment,
-        claims
+        claims,
     });
 };
 
@@ -75,6 +75,10 @@ let getUserBydocumentary = (user) => {
                                 WHERE u.id = ${x.idSender}`,
                             function (err, rows1) {
                                 if (err) reject(err);
+                                rows1.map(async (x) => {
+                                    const tags = await getTags(x.idDocumentary);
+                                    x.tags = tags;
+                                })
                                 x.items = rows1;
                                 if (i == data.length - 1) {
                                     resolve(data);
@@ -88,6 +92,26 @@ let getUserBydocumentary = (user) => {
         }
     });
 }
+let getTags = (id) => {
+    return new Promise((resolve, reject) => {
+        try {
+            db.query(
+                `Select t.id,t.name,t.code,dt.idTag  FROM documentarytags as dt INNER JOIN tags as t
+                                    ON dt.idTag = t.id
+                                    where idDocumentary = ${id}`,
+                function (err, rows) {
+                    if (err) {
+                        reject(err)
+                    }
+                    resolve(rows);
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
 
 // todo get all users
 let handleGetCategorys = async (req, res) => {

@@ -1,0 +1,250 @@
+<div id="page-wrapper">
+    <div id="page-inner">
+        <!-- /. ROW  -->
+        <div class="board">
+            <div class="panel panel-default mb-0 border-bottom pointer p-1">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        Danh sách thẻ
+                    </h4>
+                    <div class="mt-2 d-flex justify-content-end">
+                        <%if(helpers.hasCap(claims,"manage|post")){%>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#modalAddTags">Thêm</button>
+                        <%}%>
+                        <div class="modal" id="modalAddTags" tabindex="-1" role="dialog"
+                            aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4>Thêm thẻ</h4>
+                                        <button type="button" class="close" data-dismiss="modal"
+                                            aria-hidden="true">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form>
+                                            <div>
+                                                <div class="sub-title p-2">Tên</div>
+                                                <div>
+                                                    <input type="text" class="form-control" id="tagsName"
+                                                    data-inline="true" value="" />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="sub-title p-2">Màu</div>
+                                                <div class="">
+                                                    <input type="text" 
+                                                     id="tagsColor"  data-inline="true" class="form-control"
+                                                        value=""
+                                                    />
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
+                                        <button type="button" class="btn btn-primary" onclick="addTag()">Thêm</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal" id="modalEditTags" tabindex="-1" role="dialog"
+                            aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4>Sửa thẻ</h4>
+                                        <button type="button" class="close" data-dismiss="modal"
+                                            aria-hidden="true">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p id="errorEdit" class="d-none text-danger"></p>
+                                        <form>
+                                            <div>
+                                                <div class="sub-title p-2">Tên</div>
+                                                <div>
+                                                    <input type="text" class="form-control" id="nameEditTag" value=""
+                                                        placeholder="Tên..." required>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="sub-title p-2">Màu</div>
+                                                <div class="">
+                                                    <input type="text" id="tagsEditColor" data-inline="true" class="form-control" 
+                                                    value="" />
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" onclick="hideTag()" class="btn btn-default" data-dismiss="modal">Hủy</button>
+                                                <%if(helpers.hasCap(claims,"manage|put")){%>
+                        <button type="button" class="btn btn-primary" data-id="" id="submitEditTag"
+                            onclick="editTag()">Sửa</button>
+                        <%}%>
+                                      
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="d-flex w-75 flex-column">
+                            <% lists.forEach( (item,index) => { %>
+                        <div class="d-flex justify-content-between border text-white w-75 p-3"
+                            style="background-color:<%= item.code %> ">
+                            <div>
+                                <%= index+1 %>
+                            </div>
+                            <div class="flex-1">
+                                <%= item.name %>
+                            </div>
+                            <div>
+                                <%if(helpers.hasCap(claims,"manage|delete")){%>
+                                <i class="far fa-trash-alt deleteDepart" onclick="deleteTag(<%= item.id%>)"></i>
+                                <%}%>
+                                    <%if(helpers.hasCap(claims,"manage|delete")){%>
+                                <i class="far fa-edit" onclick="showEditTag(<%= JSON.stringify(item) %>)"
+                                    data-toggle="modal" data-target="#modalEditDepart" attr-id="<%= item.id %>"></i>
+                                <%}%>
+                                    </div>
+                                </div>
+                                <%})%>
+
+                            </div>
+                        </div>
+                        <!-- /. PAGE INNER  -->
+                    </div>
+                    <script>
+                        $(document).ready(function () {
+                            $('#tagsColor').minicolors({
+                                animationSpeed: 50,
+                                animationEasing: 'swing',
+                                change: null,
+                                changeDelay: 0,
+                                control: 'hue',
+                                defaultValue: '',
+                                format: 'hex',
+                                hide: null,
+                                hideSpeed: 100,
+                                inline: false,
+                                keywords: '',
+                                letterCase: 'lowercase',
+                                opacity: false,
+                                position: 'bottom left',
+                                show: null,
+                                showSpeed: 100,
+                                theme: 'bootstrap',
+                                swatches: []
+                            });
+
+                        });
+
+                        $('#tagsColor').minicolors({
+                            // Fires when the value of the color picker changes
+                            change: null,
+                            // Fires when the color picker is hidden.
+                            hide: null,
+                            // Fires when the color picker is shown. 
+                            show: null
+                        });
+                        $(document).ready(function () {
+                            $('#tagsEditColor').minicolors({
+                                animationSpeed: 50,
+                                animationEasing: 'swing',
+                                change: null,
+                                changeDelay: 0,
+                                control: 'hue',
+                                defaultValue: '',
+                                format: 'hex',
+                                hide: null,
+                                hideSpeed: 100,
+                                inline: false,
+                                keywords: '',
+                                letterCase: 'lowercase',
+                                opacity: false,
+                                position: 'bottom left',
+                                show: null,
+                                showSpeed: 100,
+                                theme: 'bootstrap',
+                                swatches: []
+                            });
+
+                        });
+
+                        $('#tagsEditColor').minicolors({
+                            // Fires when the value of the color picker changes
+                            change: null,
+                            // Fires when the color picker is hidden.
+                            hide: null,
+                            // Fires when the color picker is shown. 
+                            show: null
+                        });
+
+
+                        function addTag() {
+                            const name = $("#tagsName").val();
+                            const code = $("#tagsColor").val();
+                            const data = {
+                                name, code
+                            }
+                            callApi('tags', 'POST', data).then(res => {
+                                return res.json();
+                            }).then(res => {
+                                if (res.success) {
+                                    notify("success", "Thêm thành công");
+                                    setTimeout(() => {
+                                        window.location.href = window.location.href;
+                                    }, 1000);
+                                }
+                            })
+                        }
+
+                        function deleteTag(id) {
+                            swal("Bạn có muốn xóa", "confirm").then(x => {
+                                if (x) {
+                                    callApi('tags/' + id, 'delete').then(res => {
+                                        return res.json();
+                                    }).then(res => {
+                                        if (res.success) {
+                                            notify("success", "Xóa thành công");
+                                            setTimeout(() => {
+                                                window.location.href = window.location.href;
+                                            }, 1000);
+                                        } else {
+                                            notify("danger", "Xóa không thành công");
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                        function showEditTag(item) {
+                            $("#modalEditTags").modal("show");
+                            $("#submitEditTag").attr("data-id", item.id);
+                            $("#nameEditTag").val(item.name);
+                            $("#tagsEditColor").val(item.code);
+                        }
+                        function editTag() {
+                            const name = $("#nameEditTag").val();
+                            const code = $("#tagsEditColor").val();
+                            const id = $("#submitEditTag").attr("data-id");
+                            const data = {
+                                name, code
+                            }
+                            callApi('tags/' + id, 'put', data).then(res => {
+                                return res.json();
+                            }).then(res => {
+                                if (res.success) {
+                                    notify("success", "Sửa thành công");
+                                    setTimeout(() => {
+                                        window.location.href = window.location.href;
+                                    }, 1000);
+                                } else {
+                                    notify("danger", "Sửa không thành công");
+                                }
+                            })
+                        }
+                        function hideTag() {
+                            $("#modalEditTags").modal("hide");
+                        }
+                    </script>

@@ -11,13 +11,18 @@
                 <a href="/user/list"><i class="fa fa-desktop"></i>Người dùng</a>
             </li>
             <%}%>
-
             <li>
                 <a href="/documentary/category"><i class="fa fa-sitemap"></i>Danh mục công văn
                 </a>
             </li>
+            <%if(helpers.hasCap(claims,"manage")){%>
             <li>
                 <a href="/department"><i class="fa fa-desktop"></i>Phòng ban</a>
+            </li>
+            <%}%>
+            <li>
+                <a href="/tags"><i class="fa fa-sitemap"></i>Danh sách thẻ
+                </a>
             </li>
             <!-- 
             <li>
