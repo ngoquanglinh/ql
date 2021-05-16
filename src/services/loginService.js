@@ -9,11 +9,11 @@ let handleLogin = (email, password) => {
                 if (isMatch) {
                     resolve(true);
                 } else {
-                    reject(`Mật khẩu không chính xác`);
+                    reject(`Tài khoản hoặc mật khẩu không chính xác`);
                 }
             });
         } else {
-            reject(`Email "${email}" không tồn tại`);
+            reject(`Tài khoản "${email}" không tồn tại`);
         }
     });
 };
@@ -64,7 +64,7 @@ let comparePassword = (password, userObject) => {
                 if (isMatch) {
                     resolve(true);
                 } else {
-                    resolve(`The password that you've entered is incorrect`);
+                    resolve(`Tài khoản hoặc mật khẩu không chính xác`);
                 }
             });
         } catch (e) {

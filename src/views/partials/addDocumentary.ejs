@@ -1,57 +1,66 @@
-<div class="modal" id="addDocumentary" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" style="min-width: 80%" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Thêm công văn</h3>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-4">
-                        <h2 style="display:none;" id="uid"><%=user.id %></h2>
-                        <div>
-                            <div class="sub-title p-2">Số văn bản</div>
+<div>
+    <div class="modal" id="addDocumentary" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" style="min-width: 80%" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Thêm công văn</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-4">
+                            <h2 style="display:none;" id="uid"><%=user.id %></h2>
                             <div>
-                                <input type="text" class="form-control" value="" id="numberDocumentary"
-                                    placeholder="Tên công văn...">
+                                <div class="sub-title p-2">Số văn bản</div>
+                                <div>
+                                    <input type="text" class="form-control" value="" id="numberDocumentary"
+                                        placeholder="Tên công văn...">
+                                </div>
                             </div>
-                        </div>
-                        <div>
-                            <div class="sub-title p-2">Tên văn bản</div>
                             <div>
-                                <input type="text" class="form-control" id="name" value=""
-                                    placeholder="Tên công văn...">
+                                <div class="sub-title p-2">Tên văn bản</div>
+                                <div>
+                                    <input type="text" class="form-control" id="name" value=""
+                                        placeholder="Tên công văn...">
+                                </div>
                             </div>
-                        </div>
-                        <div class="">
-                            <div class="sub-title p-2">Nơi gửi</div>
-                            <div>
-                                <input type="text" class="form-control" id="addressSending" value=""
-                                    placeholder="Tên công văn...">
+                            <div class="">
+                                <div class="sub-title p-2">Nơi gửi</div>
+                                <div>
+                                    <input type="text" class="form-control" id="addressSending" value=""
+                                        placeholder="Tên công văn...">
+                                </div>
                             </div>
-                        </div>
-                        <div class="">
-                            <div class="sub-title p-2">Nơi ký</div>
-                            <div>
-                                <input type="text" class="form-control" value="" id="addressSign" value=""
-                                    placeholder="Tên công văn...">
+                            <div class="">
+                                <div class="sub-title p-2">Nơi ký</div>
+                                <div>
+                                    <input type="text" class="form-control" value="" id="addressSign" value=""
+                                        placeholder="Tên công văn...">
+                                </div>
                             </div>
-                        </div>
-                        <div class="">
-                            <div class="sub-title p-2">Loại văn bản</div>
-                            <div>
-                                <select class="select-category w-100" value="">
-                                </select>
+                            <div class="">
+                                <div class="sub-title p-2">Loại văn bản</div>
+                                <div>
+                                    <select class="select-category w-100" value="">
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <%if(helpers.hasCap(claims,"manage")){%>
-                        <div class="">
-                            <div class="sub-title p-2">Người nhận</div>
-                            <div>
-                                <select class="w-100" id="selectUser1" multiple="multiple" value="">
-                                </select>
+                            <%if(helpers.hasCap(claims,"manage")){%>
+                            <!-- <div class="">
+                                <div class="sub-title p-2">Người nhận</div>
+                                <div>
+                                    <select class="w-100" id="selectUser1" multiple="multiple" value="">
+                                    </select>
+                                </div>
+                            </div> -->
+                            <div class="">
+                                <div class="sub-title p-2">Phòng ban</div>
+                                <div>
+                                    <select class="w-100" id="selectUser1" multiple="multiple" value="">
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <%}%>
+                            <%}%>
                         <div class="">
                             <div class="sub-title p-2">Ngày tạo</div>
                             <div>
@@ -71,14 +80,14 @@
                             </div>
                         </div>
                         <%if(helpers.hasCap(claims,"manage")){%>
-                        <div class="d-flex justify-content-start">
-                            <div class="w-50">
-                                <div class="sub-title p-2">Loại công văn</div>
-                                <select id="selectTypeDocumentaryAdd" class="w-100" value="">
-                                </select>
+                            <div class="d-flex justify-content-start">
+                                <div class="w-50">
+                                    <div class="sub-title p-2">Loại công việc</div>
+                                    <select id="selectTypeDocumentaryAdd" class="w-100" value="">
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <%}%>
+                            <%}%>
                     </div>
                     <div class="col-8">
                         <div class="">
@@ -104,12 +113,13 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Hủy</button>
                     <%if(helpers.hasCap(claims,"manage|post")){%>
-                        <button type="button" class="btn btn-primary" id="submitAddDocumentary">Thêm</button>
-                        <%}%>
+                            <button type="button" class="btn btn-primary" id="submitAddDocumentary">Thêm</button>
+                            <%}%>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
     <script type="text/javascript">
         var host = window.location.protocol + '//' + window.location.host;
@@ -148,12 +158,13 @@
 
         // todo: select users
         $(window).load(function () {
-            callApi('user', 'Get').then(res => {
+            callApi('department/lists', 'Get').then(res => {
                 return res.json();
             }).then(res => {
-                var data = res.users.map(x => { return { "id": x.id, "text": x.username } });
+                console.log(res.items);
+                var data = res.items.map(x => { return { "id": x.id, "text": x.name } });
                 $("#selectUser1").select2({
-                    placeholder: "Người nhận...",
+                    placeholder: "Phòng ban...",
                     allowClear: true,
                     data: data,
                     tags: true,
@@ -196,17 +207,17 @@
         });
         // todo : calendar
         flatpickr('#calendar-tomorrow', {
-            "minDate": new Date().fp_incr(1),
+            "minDate": new Date(),
             dateFormat: "d-m-Y",
-            defaultDate: new Date().fp_incr(1),
+            defaultDate: new Date(),
             clickOpens: false
         });
         flatpickr('#effectiveDate', {
-            "minDate": new Date().fp_incr(1),
+            "minDate": new Date(),
             dateFormat: "d-m-Y",
         });
         flatpickr('#expirationDate', {
-            "minDate": new Date().fp_incr(1),
+            "minDate": new Date(),
             dateFormat: "d-m-Y",
         });
 
@@ -220,7 +231,6 @@
             uploads('uploads/multiple', 'POST', formData).then(res => {
                 return res.json();
             }).then(res => {
-                // let images =.map(x => host + "/" + x.url);
                 let box = $("#listImage");
                 let div = document.createElement("div");
                 div.className = "d-flex mt-1";
@@ -292,8 +302,8 @@
             }).then(res => {
                 if (res.success) {
                     notify("success", "Thêm thành công");
-                    $("#addDocumentary").hide();
-                    $('.modal-backdrop').remove();
+                    $("#addDocumentary").modal("hide");
+                    // $('.modal-backdrop').remove();
                 } else {
                     notify("error", "Thêm không thành công")
                 }

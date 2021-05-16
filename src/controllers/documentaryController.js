@@ -177,8 +177,9 @@ let getDocumentaryUser = (id) => {
     });
 };
 let adddDocumentary = (data, userId) => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
+
             var sql = `INSERT  INTO documentary (name, numberDocumentary,summary,content,idcategory,idSender,addressSending,
                 addressSign,effectiveDate,expirationDate,createdAt,type,status) VALUES
                 ("${data.name} "," ${data.numberDocumentary}","${data.summary}"," 
@@ -186,10 +187,21 @@ let adddDocumentary = (data, userId) => {
                 ","${data.addressSign}","${data.effectiveDate}","${data.expirationDate}","${data.calendarTomorrow}","${data.type}",${0})`;
             db.query(
                 sql,
-                function (err, rows) {
-                    if (err) reject(err)
+                async function (err, rows) {
+                    if (err) reject(err);
                     if (data.selectUser) {
-                        var users = data.selectUser.map(x => [x, rows.insertId]);
+                        const depDoc = data.selectUser.map(x => [x, rows.insertId]);
+                        sql = `INSERT INTO departmentdocumentarys (	idDepartment ,idDocumentary) VALUES ?`;
+                        db.query(
+                            sql,
+                            [depDoc],
+                            function (err, rows1) {
+                                if (err) reject(err)
+                            }
+                        );
+                        //
+                        var users = await getUserByDepartments(data.selectUser);
+                        users = users.map(x => [x.userId, rows.insertId]);
                         sql = `INSERT INTO documentaryuser (iduser,idDocumentary) VALUES ?`;
                         db.query(
                             sql,
@@ -199,6 +211,7 @@ let adddDocumentary = (data, userId) => {
                             }
                         );
                     }
+
                     if (data.urlImage.length > 0) {
                         data.urlImage.map((x, index) => {
                             sql = `INSERT  INTO attachmentsdocumentary (id,idDocumentary) VALUES ("${x.id}","${rows.insertId}")`;
@@ -215,6 +228,25 @@ let adddDocumentary = (data, userId) => {
                     } else {
                         resolve(rows);
                     }
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+let getUserByDepartments = (data) => {
+    return new Promise((resolve, reject) => {
+        try {
+            let sql = `SELECT ur.userId From user_roles as ur
+                    INNER JOIN roles as r 
+                    ON r.id = ur.roleId 
+                    Where  r.departmentId IN (?)`;
+            db.query(
+                sql, [data],
+                function (err, rows) {
+                    if (err) reject(err)
+                    resolve(rows);
                 }
             );
         } catch (err) {
@@ -363,9 +395,7 @@ let updateCategory = (data) => {
             db.query(
                 'UPDATE categorydocumentary SET name=? WHERE id =?', [data.name, data.id],
                 function (err, rows) {
-                    if (err) {
-                        reject(err)
-                    }
+                    if (err) reject(err)
                     resolve(rows);
                 }
             );
@@ -495,9 +525,31 @@ let editDocumentary = (data, id) => {
                  WHERE id = ${id}`;
             db.query(
                 sql,
-                function (err, rows) {
+                async function (err, rows) {
                     if (err) reject(err)
                     if (data.selectUser) {
+
+                        const depDOc = data.selectUser.map(x => [id, x]);
+
+                        sql = `DELETE  FROM departmentdocumentarys WHERE idDocumentary = ${id}`;
+                        db.query(
+                            sql,
+                            function (err, rows1) {
+                                if (err) reject(err)
+                            }
+                        );
+                        sql = `INSERT INTO departmentdocumentarys (	idDocumentary,	idDepartment ) VALUES ?`;
+                        db.query(
+                            sql,
+                            [depDOc],
+                            function (err, rows1) {
+                                if (err) reject(err)
+                            }
+                        );
+
+                        var users = await getUserByDepartments(data.selectUser);
+                        users = users.map(x => [x.userId, id]);
+
                         sql = `DELETE  FROM documentaryuser WHERE idDocumentary = ${id}`;
                         db.query(
                             sql,
@@ -505,7 +557,6 @@ let editDocumentary = (data, id) => {
                                 if (err) reject(err)
                             }
                         );
-                        var users = data.selectUser.map(x => [x, id]);
                         sql = `INSERT INTO documentaryuser (iduser,idDocumentary) VALUES ?`;
                         db.query(
                             sql,
@@ -529,6 +580,22 @@ let editDocumentary = (data, id) => {
                     } else {
                         resolve(rows);
                     }
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
+let getDepartmentdocumentarys = (id) => {
+    return new Promise((resolve, reject) => {
+        try {
+            db.query(
+                `SELECT * FROM departmentdocumentarys as dd where dd.idDocumentary = ${id}`,
+                function (err, rows) {
+                    if (err) reject(err);
+                    resolve(rows);
                 }
             );
         } catch (err) {
@@ -579,11 +646,16 @@ let getUsersDocumentarys = (id) => {
     return new Promise((resolve, reject) => {
         try {
             db.query(
-                `SELECT u.id,u.username FROM documentaryuser as du
-                            INNER JOIN users as u
-                            ON u.id = du.iduser
+                // `SELECT u.id,u.username FROM documentaryuser as du
+                //             INNER JOIN users as u
+                //             ON u.id = du.iduser
+                //             INNER JOIN documentary as d
+                //             ON du.idDocumentary = d.id
+                //             WHERE d.id = ${id}`,
+
+                `SELECT dd.idDepartment FROM departmentdocumentarys as dd
                             INNER JOIN documentary as d
-                            ON du.idDocumentary = d.id
+                            ON dd.idDocumentary  = d.id
                             WHERE d.id = ${id}`,
                 function (err, rows) {
                     if (err) {

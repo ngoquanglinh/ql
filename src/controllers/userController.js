@@ -307,13 +307,99 @@ let getRolesUser = (id) => {
         }
     });
 };
+
+// todo: update profile
+let handleEditProfile = async (req, res) => {
+    const items = await updateProfileUser(req.params.id, req.body);
+    if (items) {
+        return res.json({
+            success: true,
+            items,
+        })
+    } else {
+        return res.json({
+            success: false,
+        })
+    }
+
+};
+
+let updateProfileUser = (id, data) => {
+    return new Promise((resolve, reject) => {
+        try {
+            db.query(
+                `UPDATE users SET username=?,email=?,phone=?,avatar=? Where id=?`,
+                [data.username, data.email, data.phone, data.avatar, id],
+                function (err, rows) {
+                    if (err) reject(err);
+                    resolve(rows);
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
+// todo: update password
+let handleEditPassword = async (req, res) => {
+    const pass = await updateProfilePassword(req.params.id, req.body);
+    const update = await updatePass(pass, req.params.id);
+    if (update) {
+        return res.json({
+            success: true,
+            update,
+        })
+    } else {
+        return res.json({
+            success: false,
+        })
+    }
+};
+let updateProfilePassword = (id, data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const user = await getUserById(id);
+            bcrypt.hash(data.newPassProfile, 10, function (err, hash) {
+                if (hash) {
+                    bcrypt.compare(data.oldPassProfile, user.password, async function (err, resp) {
+                        if (err) reject();
+                        resolve(hash);
+                    });
+                } else {
+                    reject(err)
+                }
+            });
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+let updatePass = (hash, id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            db.query(
+                `UPDATE users SET password=? Where id=?`,
+                [hash, id],
+                function (err, rows) {
+                    if (err) reject(err);
+                    resolve(rows);
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
 module.exports = {
     handleGetAllUser: handleGetAllUser,
     handleShowListUser: handleShowListUser,
     handleDeleteUser: handleDeleteUser,
     handleAddUser: handleAddUser,
     handleEditUser: handleEditUser,
-    handleGetDepByUser: handleGetDepByUser
+    handleGetDepByUser: handleGetDepByUser,
+    handleEditProfile,
+    handleEditPassword
 };
 
 

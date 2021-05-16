@@ -678,12 +678,7 @@ top: 93px;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(
-    to bottom right,  
-    #2C3E50, #FD746C, 
-    #FF8235, #ffff1c, 
-    #92FE9D, #00C9FF, 
-    #a044ff, #e73827);
+   background: linear-gradient( to bottom right, #1b2734, #7a403d, #FF8235, #ffff1c, #92FE9D, #00C9FF, #a044ff, #e73827);
     background-repeat: no-repeat;
     background-size: 1000% 1000%;
     animation: gradient 240s ease infinite;
@@ -714,11 +709,11 @@ top: 93px;
   margin-right: auto;
   margin-left: auto;
   border: 12px solid transparent;
-  border-bottom-color: #41687a;
+  border-bottom-color: rgba(94, 99, 119, 1);
 }
 
 .login-header {
-  background: #41687a;
+  background: rgba(94, 99, 119, 1);
   padding: 20px;
   font-size: 1.4em;
   font-weight: normal;
@@ -763,17 +758,17 @@ top: 93px;
 }
 
 .login input[type="submit"] {
-  background: #41687a;
+  background: rgba(94, 99, 119, 1);
   border-color: transparent;
   color: #fff;
   cursor: pointer;
 }
 
 .login input[type="submit"]:hover {
-  background: #41687a;
+  background: rgba(94, 99, 119, 1);
 }
 
 /* Buttons' focus effect */
 .login input[type="submit"]:focus {
-  border-color: #41687a;
+  border-color: rgba(94, 99, 119, 1);
 }

@@ -14,14 +14,14 @@ let initPassportLocal = () => {
             try {
                 await loginService.findUserByEmail(email).then(async (user) => {
                     if (!user) {
-                        return done(null, false, req.flash("errors", `Email ${email} không tồn tại`));
+                        return done(null, false, req.flash("errors", `Tài khoản hoặc mật khẩu không chính xác`));
                     }
                     if (user) {
                         let match = await loginService.comparePassword(password, user);
                         if (match === true) {
                             return done(null, user, null)
                         } else {
-                            return done(null, false, req.flash("errors", match)
+                            return done(null, false, req.flash("errors", `Tài khoản hoặc mật khẩu không chính xác`)
                             )
                         }
                     }

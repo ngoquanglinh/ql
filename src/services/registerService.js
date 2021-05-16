@@ -6,7 +6,7 @@ let createNewUser = (data) => {
         // check email is exist or not
         let isEmailExist = await checkExistEmail(data.email);
         if (isEmailExist) {
-            reject(`This email "${data.email}" has already exist. Please choose an other email`);
+            reject(`emai "${data.email}" đã tồn tại. Bạn cần chọn email khác`);
         } else {
             // hash password
             let salt = bcrypt.genSaltSync(10);

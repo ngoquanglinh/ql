@@ -4,7 +4,7 @@
     <div class="modal-dialog" style="min-width: 80%" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Sửa công văn</h3>
+                <h3 class="text-center">Chi tiết công văn</h3>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -16,14 +16,24 @@
                         </div>
                         <div class="">
                             <div class="sub-title p-2">Tóm tắt</div>
+
                             <div>
+                                <%if(helpers.hasCap(claims,"manage|put")){%>
                                 <textarea class="form-control" rows="3" value="" id="summaryEdit"></textarea>
+                                <%}else{%>
+                                <textarea class="form-control" rows="3" value="" id="summaryEdit" disabled></textarea>
+                                <%}%>
                             </div>
                         </div>
                         <div class="">
-                            <div class="sub-title p-2">Tệp đính kèm</div>
+                            <div class="sub-title p-2">Tệp đính kèm</div>               
                             <div>
+                                <%if(helpers.hasCap(claims,"manage|put")){%>
                                 <input type="file" class="form-control-file" value="" id="fileUploadsEdit" multiple>
+                                <%}else{%>
+                                <input type="file" class="form-control-file" value="" id="fileUploadsEdit" multiple
+                                    disabled>
+                                <%}%>       
                             </div>
                         </div>
                         <div class="" id="listImageEdit">
@@ -31,50 +41,91 @@
                         </div>
                         <div class="sub-title p-2">Nội dung</div>
                         <div>
-                            <textarea cols="10" class="form-control" rows="3" id="contentDocumentaryEdit"></textarea>
+                            <%if(helpers.hasCap(claims,"manage|put")){%>
+                                <textarea cols="10" class="form-control" rows="3"
+                                    id="contentDocumentaryEdit"></textarea>
+                                <%}else{%>
+                                <textarea cols="10" class="form-control" rows="3" id="contentDocumentaryEdit"
+                                    disabled></textarea>
+                                <%}%>
                         </div>
                     </div>
                     <div class="col-4">
                         <div>
                             <div class="sub-title p-2">Số văn bản</div>
-                            <input type="text" class="form-control" value="" id="numberDocumentaryEdit"
-                                placeholder="Tên công văn...">
+                            <%if(helpers.hasCap(claims,"manage|put")){%>
+                                <input type="text" class="form-control" value="" id="numberDocumentaryEdit"
+                                    placeholder="Số văn bản...">
+                                <%}else{%>
+                                <input disabled type="text" class="form-control" value="" id="numberDocumentaryEdit"
+                                    placeholder="Số văn bản...">
+                                <%}%>
                         </div>
                         <div>
                             <div class="sub-title p-2">Tên văn bản</div>
                             <div>
+                                <%if(helpers.hasCap(claims,"manage|put")){%>
                                 <input type="text" class="form-control" id="nameEdit" value=""
                                     placeholder="Tên công văn...">
+                                <%}else{%>
+                                <input disabled type="text" class="form-control" id="nameEdit" value=""
+                                    placeholder="Tên công văn...">
+                                <%}%>
                             </div>
                         </div>
                         <div>
                             <div class="sub-title p-2">Nơi gửi</div>
                             <div>
+                                <%if(helpers.hasCap(claims,"manage|put")){%>
                                 <input type="text" class="form-control" id="addressSendingEdit" value=""
                                     placeholder="Tên công văn...">
+                                <%}else{%>
+                                <input disabled type="text" class="form-control" id="addressSendingEdit" value=""
+                                    placeholder="Tên công văn...">
+                                <%}%>
                             </div>
                         </div>
                         <div>
                             <div class="sub-title p-2">Nơi ký</div>
                             <div>
+                                <%if(helpers.hasCap(claims,"manage|put")){%>
                                 <input type="text" class="form-control" value="" id="addressSignEdit" value=""
                                     placeholder="Tên công văn...">
+                                <%}else{%>
+                                <input disabled type="text" class="form-control" value="" id="addressSignEdit" value=""
+                                    placeholder="Tên công văn...">
+                                <%}%>
                             </div>
                         </div>
                         <div>
-                            <div class="sub-title p-2">Loại văn bản</div>
+                            <div class="sub-title p-2">Loại công việc</div>
                             <div>
+                                <%if(helpers.hasCap(claims,"manage|put")){%>
                                 <select class="select-category w-100" value="">
                                 </select>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="sub-title p-2">Người nhận</div>
-                            <div>
-                                <select class="w-100" id="selectUser2" multiple="multiple" value="">
+                                <%}else{%>
+                                <select disabled class="select-category w-100" value="">
                                 </select>
+                                <%}%>
                             </div>
                         </div>
+                        <%if(helpers.hasCap(claims,"manage|put")){%>
+                                <div>
+                                    <div class="sub-title p-2">Phòng ban</div>
+                                    <div>
+                                        <select class="w-100" id="selectUser2" multiple="multiple" value="">
+                                        </select>
+                                    </div>
+                                </div>
+                                <%}else{%>
+                                <div class="d-none">
+                                    <div class="sub-title p-2">Phòng ban</div>
+                                    <div>
+                                        <select class="w-100" id="selectUser2" multiple="multiple" value="">
+                                        </select>
+                                    </div>
+                                </div>
+                                <%}%>
                         <div>
                             <div class="sub-title p-2">Ngày tạo</div>
                             <div>
@@ -84,19 +135,32 @@
                         <div>
                             <div class="sub-title p-2">Ngày hiệu lực</div>
                             <div>
+                                <%if(helpers.hasCap(claims,"manage|put")){%>
                                 <input type="text" class="form-control" id="effectiveDateEdit" value="">
+                                <%}else{%>
+                                <input disabled type="text" class="form-control" id="effectiveDateEdit" value="">
+                                <%}%>
                             </div>
                         </div>
                         <div>
                             <div class="sub-title p-2">Ngày hết hiệu lực</div>
                             <div>
+                                <%if(helpers.hasCap(claims,"manage|put")){%>
                                 <input type="text" class="form-control" id="expirationDateEdit" value="">
+                                <%}else{%>
+                                <input disabled type="text" class="form-control" id="expirationDateEdit" value="">
+                                <%}%>
                             </div>
                         </div>
                         <div class="d-none" id="processShow">
                             <div class="sub-title p-2">Tiến trình (%)</div>
                             <div>
+                                <%if(helpers.hasCap(claims,"manage|put")){%>
                                 <input type="number" class="form-control" id="process" value="" min="10" max="100">
+                                <%}else{%>
+                                <input disabled type="number" class="form-control" id="process" value="" min="10"
+                                    max="100">
+                                <%}%>
                             </div>
                         </div>
                         <div>
@@ -108,8 +172,13 @@
                         <div class="d-flex justify-content-start">
                             <div class="w-50">
                                 <div class="sub-title p-2">Loại công văn</div>
+                                <%if(helpers.hasCap(claims,"manage|put")){%>
                                 <select id="selectTypeDocumentary" class="w-100" value="">
                                 </select>
+                                <%}else{%>
+                                <select disabled id="selectTypeDocumentary" class="w-100" value="">
+                                </select>
+                                <%}%>
                             </div>
                             <div class="ml-2 w-50">
                                 <div class="sub-title p-2">Trạng thái</div>
@@ -122,11 +191,11 @@
                 </div>
                 <div class="modal-footer mt-1" id="dataIdDocument">
                     <%if(helpers.hasCap(claims,"manage|delete")){%>
-                    <button type="button" class="btn btn-danger" id="deleteDocument" data-dismiss="modal">Xóa</button>
-                    <%}%>
-                    <%if(helpers.hasCap(claims,"manage|put")){%>
-                    <button type="button" class="btn btn-primary" id="submitDocumentaryEdit">Sửa</button>
-                    <%}%>
+                                <button type="button" class="btn btn-danger" id="deleteDocument"
+                                    data-dismiss="modal">Xóa</button>
+                                <%}%>
+                                <button type="button" class="btn btn-primary" id="submitDocumentaryEdit">Cập
+                                    nhật</button>
                 </div>
             </div>
         </div>
@@ -207,12 +276,12 @@
                 minimumResultsForSearch: Infinity,
                 data: data,
             });
-            callApi('user', 'Get').then(res => {
+            callApi('department/lists', 'Get').then(res => {
                 return res.json();
             }).then(res => {
-                var data = res.users.map(x => { return { "id": x.id, "text": x.username } });
+                var data = res.items.map(x => { return { "id": x.id, "text": x.name } });
                 $("#selectUser2").select2({
-                    placeholder: "Người nhận...",
+                    placeholder: "Phòng ban...",
                     allowClear: true,
                     data: data,
                     tags: true,
@@ -293,7 +362,11 @@
                                     img = document.createElement("img");
                                     img.className = "image-upload";
                                     img.src = `${host}/assets/uploads/${x.url}`;
-                                    div.appendChild(img);
+                                    link = document.createElement("a");
+                                    link.setAttribute("target", "_blank");
+                                    link.setAttribute("href", img.src);
+                                    link.appendChild(img);
+                                    div.appendChild(link);
                                     break;
                             }
                         })
@@ -309,7 +382,7 @@
                 return res.json();
             }).then(res => {
                 if (res.success) {
-                    const users = res.items.map(x => { return x.id });
+                    const users = res.items.map(x => { return x.idDepartment });
                     $('#selectUser2 option').map(function () {
                         let id = parseInt($(this).val());
                         if (users.includes(id)) {

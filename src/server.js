@@ -15,6 +15,7 @@ const userRoutes = require("./routes/user");
 const documentaryRoutes = require("./routes/documentary");
 const departmentRoutes = require("./routes/department");
 const tagsRoutes = require("./routes/tags");
+const profileRoutes = require("./routes/profile");
 //
 
 let app = express();
@@ -55,7 +56,8 @@ uploadRoutes(app);
 userRoutes(app);
 documentaryRoutes(app);
 departmentRoutes(app)
-tagsRoutes(app)
+tagsRoutes(app);
+profileRoutes(app);
 //
 
 //Tạo socket 
