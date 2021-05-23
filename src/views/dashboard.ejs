@@ -1,140 +1,344 @@
 <div id="page-wrapper">
     <div id="page-inner">
-        <!-- /. ROW  -->
         <div class="mt-2 mb-3 d-flex justify-content-end">
             <%if(helpers.hasCap(claims,"manage|post")){%>
             <button class="btn btn-primary" data-toggle="modal" onclick="showModalAddDep()">Thêm</button>
             <%}%>
         </div>
         <div class="">
-            <% lists.forEach( (item,index) => { %>
-            <div class="panel panel-default mb-1 border-bottom pointer p-1">
-                <div class=" panel-heading">
-                    <h4 class="panel-title">
-                        <div data-toggle="collapse" class="panel-user" data-id="<%= item.idSender %>"
-                            data-parent="#accordion" href="#collapse<%= item.idSender %>" class="collapsed">
-                            <div class="d-flex justify-content-between">
-                                <div class="d-flex">
-                                    <% if(item.avatar) { %>
-                                    <div>
-                                        <img src=<%-item.avatar%> class="avatar" />
-                                    </div>
-                                    <%}else{%>
-                                    <div class="avatar__name">
-                                        <span><%-helpers.charAt(item.username)%></span>
-                                    </div>
-                                    <%}%>
-                                    <div class="ml-2">
-                                        <span class="p-1"><%= item.username %></span>
-                                    <p class="m-0 p-1 ml-1 font-weight-bold" id="userTotal<%= item.idSender %>"
-                                        data-total="<%-helpers.length(item.items)%>">
-                                        <%-helpers.length(item.items)%> Công văn
-                                    </p>
-                                </div>
-                            </div>
+            <!--  -->
+            <% deps.forEach( (item,index) => { %>
+            <div class="accordion pointer" id="accordionExample">
+                <div class="card mb-1">
+                    <div class="card-header" onclick="getTasks(<%= item.id %>)" id="heading-<%= item.id %>"
+                        style="height: 65px;">
+                        <div class="collapsed h-100 font-weight-bold d-flex align-items-center justify-content-between;"
+                            type="button" data-toggle="collapse" data-target="#dep-<%= item.id %>" aria-expanded="false"
+                            aria-controls="dep-<%= item.id %>">
+                            <%= item.name %>
                         </div>
+                    </div>
+                    <div id="dep-<%= item.id %>" class="collapse" aria-labelledby="heading-<%= item.id %>"
+                        data-parent="#accordionExample">
+                        <div class="card-body">
+
+                        </div>
+                    </div>
                 </div>
-                </h4>
             </div>
-            <div id="collapse<%= item.idSender %>" class="panel-collapse collapse" style="height: 0px;">
-                <div class="row p-3 m-0 border-top border-bottom">
-                    <div class="col-6">
-                        <div class="text-dark font-weight-bold">Công văn</div>
-                    </div>
-                    <div class="col-6">
-                        <div class="d-flex justify-content-between h-100 align-items-center">
-                            <div class="flex-basis-25">
-                                <div class="d-flex align-items-center font-weight-bold">Ngày nhận</div>
-                            </div>
-                            <div class="flex-basis-25">
-                                <div class="d-flex align-items-center font-weight-bold">Ngày kết thúc</div>
-                            </div>
-                            <div class="flex-basis-25 font-weight-bold">
-                                Tiến trình
-                            </div>
-                            <div class="flex-basis-25">
-                                <div class="d-flex align-items-center font-weight-bold">
-                                    Trạng thái
-                                </div>
-                            </div>
+            <% }) %>
+            <!--  -->
+            <!--  -->
+            <%if(helpers.hasCap(claims,"manage")){%>
+            <div class="accordion pointer" id="accordionExample1">
+                <div class="card mb-1">
+                    <div class="card-header" id="heading-dep" style="height: 65px;">
+                        <div class="collapsed h-100 font-weight-bold d-flex align-items-center justify-content-between;"
+                            type="button" data-toggle="collapse" data-target="#depEmpty" aria-expanded="false"
+                            aria-controls="depEmpty">
+                            Không thuộc phòng ban
                         </div>
                     </div>
-                </div>
-                <div id="documentaryUser<%= item.idSender %>">
-                    <% item.items.forEach( (it,i) => { %>
-                    <div id="documentary-<%= it.idDocumentary %>"
-                        class="detail-document row m-0 panel-body p-2 border-bottom mb-1"
-                        data-value="<%=encodeURIComponent(JSON.stringify(it))%>">
-                        <div class="col-6">
-                            <div class="d-flex justify-content-between h-100 align-items-center">
-                                <div class="">
-                                    <div class="d-flex align-items-center"><%= it.name %></div>
+                    <div id="depEmpty" class="collapse" aria-labelledby="heading-dep" data-parent="#accordionExample1">
+                        <div class="card-body">
+                            <div class="row p-3 m-0  border-bottom">
+                                <div class="col-6">
+                                    <div class="text-dark font-weight-bold">Công văn</div>
                                 </div>
-                                <div class="d-flex flex-wrap home-list-tags">
-                                    <% it.tags.forEach( x => { %>
-                                    <div data-id="<%= x.id %>" class="p-2 ml-2 rounded pointer text-white"
-                                        style="background-color:<%= x.code %>">
-                                        <%= x.name %>
-                                    </div>
-                                    <%})%>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="d-flex justify-content-between h-100 align-items-center">
-                                <div class="flex-basis-25">
-                                    <div class="d-flex align-items-center">
-                                        <%=moment(it.effectiveDate).format("DD-MM-YYYY")%>
-                                    </div>
-                                </div>
-                                <div class="flex-basis-25">
-                                    <div class="d-flex align-items-center">
-                                        <%=moment(it.expirationDate).format("DD-MM-YYYY")%>
-                                    </div>
-                                </div>
-                                <div class="flex-basis-25">
-                                    <% if(it.type == 1) { %>
-                                    <div class="progress mb-0 d-flex align-items-center mr-2">
-                                        <div class="progress-bar progress-bar-striped active" role="progressbar"
-                                            aria-valuenow="<%=it.process%>" aria-valuemin="0" aria-valuemax="100"
-                                            style="width:<%=it.process%>%">
-                                            <%=it.process%>%
+                                <div class="col-6">
+                                    <div class="d-flex justify-content-between h-100 align-items-center">
+                                        <div class="flex-basis-25">
+                                            <div class="d-flex align-items-center font-weight-bold">Ngày nhận</div>
                                         </div>
-                                    </div>
-                                    <%}%>
-                                </div>
-                                <div class="flex-basis-25">
-                                    <div class="d-flex align-items-center">
-                                        <button  class="btn btn-primary" aria-expanded="true">
-                                            <% if(it.status == 0) { %>
-                                    Mới
-                                    <%}else if(it.status == 1){%>
-                                    Chưa xử lý
-                                    <%}else{%>
-                                    Đã xử lý
-                                    <%}%>
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                        <div class="flex-basis-25">
+                                            <div class="d-flex align-items-center font-weight-bold">Ngày kết thúc</div>
+                                        </div>
+                                        <div class="flex-basis-25 font-weight-bold">
+                                            Tiến trình
+                                        </div>
+                                        <div class="flex-basis-25">
+                                            <div class="d-flex align-items-center font-weight-bold">
+                                                Trạng thái
                                             </div>
                                         </div>
                                     </div>
-                                    <% }) %>
+                                </div>
+                            </div>
+
+                            <% docNotdeps.forEach( (item,index) => { %>
+                            <div class="row p-3 m-0 border-top border-bottom" id="doc-<%=item.id%>"
+                                onclick="detailDoc(<%=item.id%>,'noDepartment')">
+                                <div class="col-6">
+                                    <div class="text-dark"><%=item.name%></div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-flex justify-content-between h-100 align-items-center">
+                                        <div class="flex-basis-25">
+                                            <div class="d-flex align-items-center">
+                                                <%=moment(item.effectiveDate).format("DD/MM/YYYY")%>
+                                            </div>
+                                        </div>
+                                        <div class="flex-basis-25">
+                                            <div class="d-flex align-items-center ">
+                                                <%=moment(item.expirationDate).format("DD/MM/YYYY")%>
+                                            </div>
+                                        </div>
+                                        <div class="flex-basis-25">
+                                            <% if(item.type == 1) { %>
+                                            <div class="progress mb-0 d-flex align-items-center mr-2">
+                                                <div class="progress-bar progress-bar-striped active" role="progressbar"
+                                                    aria-valuenow="<%=item.process%>" aria-valuemin="0"
+                                                    aria-valuemax="100" style="width:<%=item.process%>%">
+                                                    <%=item.process%>%
+                                                </div>
+                                            </div>
+                                            <%}%>
+                                        </div>
+                                        <div class="flex-basis-25">
+                                            <div class="d-flex align-items-center font-weight-bold">
+                                                    <button class="btn btn-primary" aria-expanded="true">
+                                                        <% if(item.status == 0) { %>
+                                            Mới
+                                            <%}else if(item.status == 1){%>
+                                            Chưa xử lý
+                                            <%}else{%>
+                                            Đã xử lý
+                                            <%}%>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }) %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <% } %>
+                        </div>
+                    </div>
+                    </h4>
+                </div>
+                <div>
+                    <%- include("./partials/editDocumentary.ejs")  %>
+                </div>
+                <div>
+                    <%- include("./partials/addDocumentary.ejs")  %>
+                </div>
+            </div>
+            <script>
+                function showModalAddDep() {
+                    $("#addDocumentary").modal("show");
+                }
+                function detailDoc(id, action = 'department') {
+                    const depId = $(`#doc-${id}`).attr("data-id");
+                    $("#processShow").removeAttr('class');
+                    $("#processShow").attr('class', 'd-none');
+                    $("#detailDocumentModal").modal("show");
+
+                    callApi('documentary/attachments/' + id, 'Get').then(res => {
+                        return res.json();
+                    }).then(res => {
+                        if (res.success) {
+                            let images = res.items.map(x => host + "/" + "assets/uploads/" + x.url);
+                            let box = $("#listImageEdit");
+                            let div = document.createElement("div");
+                            div.className = "d-flex mt-2";
+                            if (images.length > 0) {
+                                box.empty();
+                                res.items.map(x => {
+                                    var link, img;
+                                    switch (x.type) {
+                                        case "application/msword": case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                                            link = document.createElement("a");
+                                            link.setAttribute("download", "true");
+                                            img = document.createElement("img");
+                                            link.className = "link-upload pointer";
+                                            img.className = "image-upload";
+                                            link.href = `${host}/${x.url}`;
+                                            img.src = `${host}/assets/images/document.png`;
+                                            link.appendChild(img);
+                                            div.appendChild(link);
+                                            break;
+                                        case "image/jpeg": case "image/png": case "image/jpg": case "image/jepg": case "image/gif":
+                                            img = document.createElement("img");
+                                            img.className = "image-upload";
+                                            img.src = `${host}/assets/uploads/${x.url}`;
+                                            link = document.createElement("a");
+                                            link.setAttribute("target", "_blank");
+                                            link.setAttribute("href", img.src);
+                                            link.appendChild(img);
+                                            div.appendChild(link);
+                                            break;
+                                    }
+                                })
+                                box.append(div);
+                                box.attr("data-value", encodeURIComponent(JSON.stringify(res.items)));
+                            } else {
+                                box.empty();
+                            }
+                            // listTagsEdit
+                        }
+                    })
+
+
+                    callApi('tags/tags-documentary/' + id, 'Get').then(res => {
+                        return res.json();
+                    }).then(res => {
+                        if (res.success) {
+                            $("#listTagsEdit").empty();
+                            if (res.items.length > 0) {
+                                let row = '';
+                                res.items.map((x) => {
+                                    row = `<div data-id="${x.id}" class="rounded items-assign border align-items-center d-flex text-center justify-content-center text-white p-2 pointer mb-1" style="background-color:${x.code}">
+                                    <div>${x.name}</div>
+                                <div>
+                                `;
+                                    $("#listTagsEdit").append(row);
+                                });
+                            } else {
+                                $("#listTagsEdit").empty();
+                            }
+                        }
+                    })
+                    callApi('documentary/' + id, 'Get').then(res => {
+                        return res.json();
+                    }).then(res => {
+                        if (res.success) {
+                            $("#deleteDocument").attr("data-id", res.items[0].id);
+                            $("#dataIdDocument").attr("data-id", res.items[0].id);
+                            $("#submitDocumentaryEdit").attr("data-id", res.items[0].id);
+                            $("#numberDocumentaryEdit").val(res.items[0].numberDocumentary);
+                            $("#nameEdit").val(res.items[0].name);
+                            $("#addressSendingEdit").val(res.items[0].addressSending);
+                            $("#addressSignEdit").val(res.items[0].addressSign);
+                            $(".select-category").val(res.items[0].idcategory);
+                            $("#calendarTomorrowEdit").val(moment(res.items[0].createdAt).format("DD-MM-YYYY"));
+                            $("#effectiveDateEdit").val(moment(res.items[0].effectiveDate).format("DD-MM-YYYY"));
+                            $("#expirationDateEdit").val(moment(res.items[0].expirationDate).format("DD-MM-YYYY"));
+                            $("#summaryEdit").val(res.items[0].summary);
+                            $("#selectTypeDocumentary").val(res.items[0].type);
+                            $("#selectStatusDocumentary").val(res.items[0].status);
+                            tinymce.get("contentDocumentaryEdit")?.setContent(res.items[0].content);
+                            $("#selectTypeDocumentary").prop("selected", "selected").trigger('change');
+                            $("#selectStatusDocumentary").prop("selected", "selected").trigger('change');
+                            console.log(res.items, "a");
+                            if (res.items[0].type == 1) {
+                                $("#processShow").removeClass("d-none");
+                                $("#process").val(res.items[0].process);
+                            }
+                        }
+                    })
+
+                    if (action == "department") {
+                        $("#showDepSelect").hide();
+                        $("#showUserSelect").show();
+
+
+                        callApi('department/lists-user/' + depId, 'Get').then(res => {
+                            return res.json();
+                        }).then(res => {
+                            var data = res.items.map(x => { return { "id": x.id, "text": x.username } });
+                            $("#selectUser3").select2({
+                                placeholder: "Nhân viên...",
+                                allowClear: true,
+                                data: data,
+                                tags: true,
+                                tokenSeparators: [',', ' ']
+                            });
+                        })
+                        callApi('documentary/users-assign/' + id, 'Get').then(res => {
+                            return res.json();
+                        }).then(res => {
+                            if (res.success) {
+                                const users = res.items.map(x => { return x.id });
+                                $('#selectUser3 option').map(function () {
+                                    let id = parseInt($(this).val());
+                                    if (users.includes(id)) {
+                                        $(this).prop("selected", "selected").trigger('change');
+                                    } else {
+                                        $(this).removeProp("selected").trigger('change');
+                                    }
+                                });
+                            }
+                        })
+
+                    } else {
+                        $("#showDepSelect").show();
+                        $("#showUserSelect").hide();
+                    }
+                }
+                function getTasks(id) {
+                    const div = $(`#dep-${id} .card-body`);
+                    if (div.children().length <= 0) {
+                        callApi('department/doc-dep/' + id, 'get').then(res => {
+                            return res.json();
+                        }).then(res => {
+                            if (res.success) {
+                                let rows = `
+                         <div class="row p-3 m-0  border-bottom">
+                            <div class="col-6">
+                                <div class="text-dark font-weight-bold">Công văn</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex justify-content-between h-100 align-items-center">
+                                    <div class="flex-basis-25">
+                                        <div class="d-flex align-items-center font-weight-bold">Ngày nhận</div>
+                                    </div>
+                                    <div class="flex-basis-25">
+                                        <div class="d-flex align-items-center font-weight-bold">Ngày kết thúc</div>
+                                    </div>
+                                    <div class="flex-basis-25 font-weight-bold">
+                                        Tiến trình
+                                    </div>
+                                    <div class="flex-basis-25">
+                                        <div class="d-flex align-items-center font-weight-bold">
+                                            Trạng thái
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <% }) %>
-                        <div>
-                            <%- include("./partials/editDocumentary.ejs")  %>
-                        </div>
-                        <div>
-                            <%- include("./partials/addDocumentary.ejs")  %>
-                        </div>
-
-                    </div>
-                    <!-- /. PAGE INNER  -->
-                    <script>
-                        function showModalAddDep() {
-                            $("#addDocumentary").modal("show");
-                        }
-                    </script>
+                        `;
+                                res.items.map((x, i) => {
+                                    rows +=
+                                        `<div class="row p-3 m-0 border-top border-bottom" id="doc-${x.id}" data-id="${x.idDepartment}" onclick="detailDoc(${x.id})">
+                                <div class="col-6">
+                                    <div class="text-dark">${x.name}</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-flex justify-content-between h-100 align-items-center">
+                                        <div class="flex-basis-25">
+                                            <div class="d-flex align-items-center">${moment(x.effectiveDate).format("DD/MM/YYYY")}</div>
+                                        </div>
+                                        <div class="flex-basis-25">
+                                            <div class="d-flex align-items-center">${moment(x.expirationDate).format("DD/MM/YYYY")}</div>
+                                        </div>
+                                        <div class="flex-basis-25">
+                                           ${x.type == 1 ?
+                                            `   
+                                            <div class="progress mb-0 d-flex align-items-center mr-2">
+                                                <div class="progress-bar progress-bar-striped active" role="progressbar"
+                                                    aria-valuenow="${x.process}" aria-valuemin="0" aria-valuemax="100"
+                                                    style="width:${x.process}%;font-size: 0.8rem;">${x.process}%</div>
+                                            </div>
+                            `: ''}
+                                        </div>
+                                        <div class="flex-basis-25">
+                                            <div class="d-flex align-items-center">
+                                                <button  class="btn btn-primary" aria-expanded="true">
+                                                ${x.status == 0 ? " Mới" : x.status == 1 ? "Chưa xử lý" : "Đã xử lý"}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                                });
+                                $(`#dep-${id} .card-body`).append(rows);
+                            }
+                        })
+                    }
+                }
+            </script>

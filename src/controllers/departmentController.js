@@ -2,6 +2,7 @@ import db from "./../configs/DBConnection";
 import registerService from "../services/registerService";
 import bcrypt from "bcryptjs";
 var helpers = require('./../lib/helpers');
+import { checkAuth } from "./../validation/auth";
 // todo get all users
 let handleGetAllDepartmentsLists = async (req, res) => {
     let items = await getAllDepartments();
@@ -38,7 +39,8 @@ let handleGetAllDepartments = async (req, res) => {
         title: "department",
         lists,
         helpers,
-        claims
+        claims,
+        user: req.user,
     });
 };
 let getClaims = (id) => {
@@ -64,14 +66,31 @@ let getClaims = (id) => {
                     } else {
                         resolve([]);
                     }
-
                 }
-            );
+            )
         } catch (err) {
             reject(err);
         }
     });
 };
+
+// rows.map((x, i) => {
+//     db.query(
+//         `SELECT r.name FROM roles as r
+//                             INNER JOIN user_roles as ur 
+//                             ON r.id = ur.roleId
+//                             INNER JOIN users as u
+//                             ON u.id = ur.userId
+//                             WHERE ur.userId = ${x.id}
+//                             `,
+//         function (err, rows1) {
+//             if (err) reject(err);
+//             x.roles = rows1;
+//             if (i == rows.length - 1) resolve(rows);
+//         }
+//     );
+// })
+
 // todo: delete phong ban
 let handleDeleteDepart = async (req, res) => {
     await deleteDepart(req.params.id);
@@ -438,6 +457,69 @@ let createClaimsByRole = (data) => {
         }
     });
 };
+//
+let handleGetAllDepartmentsDoc = async (req, res) => {
+    let items = await getAllDepartmentsDoc(req.params.id, req.user);
+    return res.json({
+        success: true,
+        items
+    })
+};
+let getAllDepartmentsDoc = (id, user) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const checkManage = await checkAuth(user, "manage|manageDepartment");
+            let sql = '';
+            if (checkManage) {
+                sql = `SELECT d.id,d.name,d.status,d.createdAt,d.effectiveDate,d.expirationDate,d.process,d.type,dd.idDepartment FROM documentary as d
+                INNER JOIN departmentdocumentarys as dd ON d.id = dd.idDocumentary
+                where dd.idDepartment  = ${id}`;
+            } else {
+                sql = `SELECT d.id,d.name,d.status,d.createdAt,d.effectiveDate,d.expirationDate,d.process,d.type,dd.idDepartment FROM documentary as d
+                INNER JOIN departmentdocumentarys as dd ON d.id = dd.idDocumentary
+                INNER JOIN documentaryuser as du ON du.idDocumentary = d.id
+                where dd.idDepartment  = ${id} and du.iduser = ${user.id}`;
+            }
+            db.query(
+                sql,
+                function (err, rows) {
+                    if (err) reject(err);
+                    resolve(rows);
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+//
+
+let handleUserDepartment = async (req, res) => {
+    let items = await handleGetUserDepartment(req.params.id);
+    return res.json({
+        success: true,
+        items
+    })
+};
+let handleGetUserDepartment = (id) => {
+    return new Promise((resolve, reject) => {
+        try {
+            db.query(
+                `SELECT u.id,u.username FROM users as u
+                INNER JOIN user_roles as ur ON u.id = ur.userId
+                INNER JOIN roles as r ON ur.roleId = r.id
+                where r.departmentId = ${id} group by u.id`,
+                function (err, rows) {
+                    if (err) reject(err);
+                    resolve(rows);
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
 module.exports = {
     handleGetAllDepartments: handleGetAllDepartments,
     handleAddDepart: handleAddDepart,
@@ -449,7 +531,9 @@ module.exports = {
     handleDeleteRoles: handleDeleteRoles,
     handleEditRoles: handleEditRoles,
     handleGetListClaim: handleGetListClaim,
-    handleEditRoleClaim: handleEditRoleClaim
+    handleEditRoleClaim: handleEditRoleClaim,
+    handleGetAllDepartmentsDoc,
+    handleUserDepartment
 };
 
 

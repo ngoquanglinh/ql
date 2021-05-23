@@ -2,17 +2,15 @@
     <div class="sidebar-collapse">
         <ul class="nav" id="main-menu">
             <li>
-                <a class="active-menu" href="/"><i class="fa fa-dashboard"></i>
+                <a class="" href="/"><i class="fa fa-dashboard"></i>
                     Trang chủ
                 </a>
             </li>
-            <%if(helpers.hasCap(claims,"manage")){%>
             <li>
-                <a href="/user/list"><i class="fa fa-desktop"></i>Người dùng</a>
+                <a href="/user/list"><i class="fas fa-users"></i>Người dùng</a>
             </li>
-            <%}%>
             <li>
-                <a href="/documentary/category"><i class="fa fa-sitemap"></i>Danh mục công việc
+                <a href="/documentary/category"><i class="fas fa-tasks"></i>Danh mục công việc
                 </a>
             </li>
             <%if(helpers.hasCap(claims,"manage")){%>
@@ -21,11 +19,11 @@
             </li>
             <%}%>
             <li>
-                <a href="/tags"><i class="fa fa-sitemap"></i>Danh sách thẻ
+                <a href="/tags"><i class="fas fa-tags"></i>Danh sách thẻ
                 </a>
             </li>
             <li>
-                <a href="/profile"><i class="fa fa-sitemap"></i>Tài khoản
+                <a href="/profile"><i class="fas fa-user-circle"></i>Tài khoản
                 </a>
             </li>
             <!-- 

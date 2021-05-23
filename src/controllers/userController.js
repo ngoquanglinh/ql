@@ -16,10 +16,24 @@ let getAllUser = () => {
             db.query(
                 ' SELECT * FROM users',
                 function (err, rows) {
-                    if (err) {
-                        reject(err)
-                    }
-                    resolve(rows);
+                    if (err) reject(err)
+                    rows.map((x, i) => {
+                        db.query(
+                            `SELECT r.name FROM roles as r
+                            INNER JOIN user_roles as ur 
+                            ON r.id = ur.roleId
+                            INNER JOIN users as u
+                            ON u.id = ur.userId
+                            WHERE ur.userId = ${x.id}
+                            `,
+                            function (err, rows1) {
+                                if (err) reject(err);
+                                x.roles = rows1;
+                                if (i == rows.length - 1) resolve(rows);
+                            }
+                        );
+                    })
+                    // resolve(rows);
                 }
             );
         } catch (err) {
@@ -68,13 +82,16 @@ let handleShowListUser = async (req, res) => {
         title: "users",
         users,
         helpers,
-        claims
+        claims,
+        user: req.user,
     });
 };
 
 // todo: delete user
 let handleDeleteUser = async (req, res) => {
     await deleteDocumentary(req.params.id);
+    await deleteUserRoles(req.params.id);
+    await deleteProgess(req.params.id);
     await deleteUser(req.params.id);
     return res.json({
         success: true,
@@ -86,6 +103,40 @@ let deleteUser = (id) => {
         try {
             db.query(
                 'DELETE  FROM users WHERE id = ?', id,
+                function (err, rows) {
+                    if (err) {
+                        reject(err)
+                    }
+                    resolve(rows);
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+let deleteUserRoles = (id) => {
+    return new Promise((resolve, reject) => {
+        try {
+            db.query(
+                'DELETE  FROM user_roles WHERE userId = ?', id,
+                function (err, rows) {
+                    if (err) {
+                        reject(err)
+                    }
+                    resolve(rows);
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+let deleteProgess = (id) => {
+    return new Promise((resolve, reject) => {
+        try {
+            db.query(
+                'DELETE  FROM progessdocumentarys WHERE idUser = ?', id,
                 function (err, rows) {
                     if (err) {
                         reject(err)

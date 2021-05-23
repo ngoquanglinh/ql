@@ -7,6 +7,8 @@ import { checkAuth } from "./../validation/auth";
 let handleDasboard = async (req, res) => {
     let lists = await getUserBydocumentary(req.user);
     const claims = await getClaims(req.user.id);
+    const deps = await departments(req.user);
+    const docNotdeps = await docNotdepartments(req.user);
     return res.render("dashboard", {
         layout: "layouts/main.ejs",
         extractScripts: true,
@@ -16,6 +18,8 @@ let handleDasboard = async (req, res) => {
         helpers,
         moment: moment,
         claims,
+        deps,
+        docNotdeps
     });
 };
 
@@ -143,14 +147,14 @@ let getCategorys = () => {
 let handleAddDocumentary = async (req, res) => {
     let result = await adddDocumentary(req.body, req.user.id);
     const item = await getDocumentaryById(result.insertId);
-    const users = await getDocumentaryUser(result.insertId);
+    // const users = await getDocumentaryUser(result.insertId);
     if (item) {
-        socket.io.emit("documentary", { action: "add", data: { item, users } });
+        socket.io.emit("documentary", { action: "add", data: item });
     }
-    if (item) {
+    if (result) {
         return res.json({
             success: true,
-            item
+            // item
         })
     } else {
         return res.json({
@@ -190,26 +194,25 @@ let adddDocumentary = (data, userId) => {
                 async function (err, rows) {
                     if (err) reject(err);
                     if (data.selectUser) {
-                        const depDoc = data.selectUser.map(x => [x, rows.insertId]);
-                        sql = `INSERT INTO departmentdocumentarys (	idDepartment ,idDocumentary) VALUES ?`;
+                        // const depDoc = data.selectUser.map(x => [x, rows.insertId]);
+                        sql = `INSERT INTO departmentdocumentarys (	idDepartment ,idDocumentary) VALUES ("${data.selectUser}","${rows.insertId}")`;
                         db.query(
                             sql,
-                            [depDoc],
                             function (err, rows1) {
                                 if (err) reject(err)
                             }
                         );
                         //
-                        var users = await getUserByDepartments(data.selectUser);
-                        users = users.map(x => [x.userId, rows.insertId]);
-                        sql = `INSERT INTO documentaryuser (iduser,idDocumentary) VALUES ?`;
-                        db.query(
-                            sql,
-                            [users],
-                            function (err, rows1) {
-                                if (err) reject(err)
-                            }
-                        );
+                        // var users = await getUserByDepartments(data.selectUser);
+                        // users = users.map(x => [x.userId, rows.insertId]);
+                        // sql = `INSERT INTO documentaryuser (iduser,idDocumentary) VALUES ?`;
+                        // db.query(
+                        //     sql,
+                        //     [users],
+                        //     function (err, rows1) {
+                        //         if (err) reject(err)
+                        //     }
+                        // );
                     }
 
                     if (data.urlImage.length > 0) {
@@ -257,16 +260,9 @@ let getUserByDepartments = (data) => {
 let getDocumentaryById = (id) => {
     return new Promise((resolve, reject) => {
         try {
-            var sql = `
-            SELECT *, d.createdAt as createdAt, c.name as nameCategory FROM documentary as d
-                INNER JOIN categorydocumentary as c
-                ON c.id = d.idcategory
-                INNER JOIN documentaryuser as du
-                ON d.id = du.idDocumentary
-                INNER JOIN users as u
-                ON u.id = du.iduser
-                WHERE d.id = ${id}`
-                ;
+            var sql = `SELECT d.id,d.name,d.status,d.createdAt,d.effectiveDate,d.expirationDate,d.process,d.type,dd.idDepartment FROM documentary as d
+                INNER JOIN departmentdocumentarys as dd ON d.id = dd.idDocumentary
+                where d.id  = ${id}`;
             db.query(
                 sql, id,
                 function (err, rows) {
@@ -290,6 +286,7 @@ let showCategory = async (req, res) => {
         title: "category",
         users,
         helpers,
+        user: req.user,
         claims
     });
 };
@@ -417,11 +414,11 @@ let getDocumentary = (id) => {
         try {
             var sql = `
             SELECT d.id,d.name,d.numberDocumentary,d.summary,d.content,d.idcategory,d.idSender,d.addressSending,
-            d.addressSending,d.addressSign, d.status,d.effectiveDate,d.expirationDate,d.process,d.createdAt,d.updateAt,
+            d.addressSending,d.addressSign, d.status,d.effectiveDate,d.expirationDate,d.process,d.type,d.createdAt,d.updateAt,
             c.name as nameCategory FROM documentary as d
                 INNER JOIN categorydocumentary as c
                 ON c.id = d.idcategory 
-                WHERE idSender=?`;
+                WHERE d.id=?`;
             db.query(
                 sql, id,
                 async function (err, rows) {
@@ -510,6 +507,10 @@ let deleteDocumentary = (id) => {
 // todo : edit documentary
 let handleEditDocumentary = async (req, res) => {
     let users = await editDocumentary(req.body, req.params.id);
+    const item = await getDocumentaryById(req.params.id);
+    if (item) {
+        socket.io.emit("documentary", { action: "edit", data: item });
+    }
     return res.json({
         success: true,
         id: req.params.id
@@ -527,28 +528,9 @@ let editDocumentary = (data, id) => {
                 sql,
                 async function (err, rows) {
                     if (err) reject(err)
-                    if (data.selectUser) {
+                    if (data.selectUser && data.selectUser.length > 0) {
 
-                        const depDOc = data.selectUser.map(x => [id, x]);
-
-                        sql = `DELETE  FROM departmentdocumentarys WHERE idDocumentary = ${id}`;
-                        db.query(
-                            sql,
-                            function (err, rows1) {
-                                if (err) reject(err)
-                            }
-                        );
-                        sql = `INSERT INTO departmentdocumentarys (	idDocumentary,	idDepartment ) VALUES ?`;
-                        db.query(
-                            sql,
-                            [depDOc],
-                            function (err, rows1) {
-                                if (err) reject(err)
-                            }
-                        );
-
-                        var users = await getUserByDepartments(data.selectUser);
-                        users = users.map(x => [x.userId, id]);
+                        const users = data.selectUser.map(x => [x, id]);
 
                         sql = `DELETE  FROM documentaryuser WHERE idDocumentary = ${id}`;
                         db.query(
@@ -561,6 +543,25 @@ let editDocumentary = (data, id) => {
                         db.query(
                             sql,
                             [users],
+                            function (err, rows1) {
+                                if (err) reject(err)
+                            }
+                        );
+
+                        // sql = `INSERT INTO progessdocumentarys (idUser,idDocumentary) VALUES ?`;
+                        // db.query(
+                        //     sql,
+                        //     [users],
+                        //     function (err, rows1) {
+                        //         console.log(rows1, "vao day");
+                        //         if (err) reject(err)
+                        //     }
+                        // );
+                    }
+                    if (data.selectDep) {
+                        sql = `INSERT INTO departmentdocumentarys (idDocumentary,idDepartment ) VALUES  ("${id}","${data.selectDep}")`;
+                        db.query(
+                            sql,
                             function (err, rows1) {
                                 if (err) reject(err)
                             }
@@ -669,6 +670,90 @@ let getUsersDocumentarys = (id) => {
         }
     });
 };
+
+/// recode 
+
+let departments = (user) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const check = await checkAuth(user, "manage");
+            let sql = "";
+            if (check) {
+                sql = `SELECT *  FROM departments`;
+            } else {
+                sql = `SELECT d.id,d.name,d.parentId,d.parentId,d.updateAt  FROM departments as d
+                INNER JOIN roles as r
+                ON r.departmentId = d.id 
+                INNER JOIN user_roles as ur 
+                ON ur.roleId = r.id
+                where ur.userId =  ${user.id} group by d.id`;
+            }
+            db.query(
+                sql,
+                function (err, rows) {
+                    if (err) reject(err);
+                    console.log(rows);
+                    resolve(rows);
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
+let docNotdepartments = (user) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const check = await checkAuth(user, "manage");
+            let sql = "";
+            if (check) {
+                sql = `SELECT DISTINCT  d.id,d.name,d.status,d.effectiveDate,d.expirationDate,d.type,d.process,d.type  FROM documentary as d
+                WHERE d.id NOT IN ( SELECT idDocumentary FROM departmentdocumentarys WHERE idDocumentary IS NOT NULL)`;
+                db.query(
+                    sql,
+                    function (err, rows) {
+                        if (err) reject(err);
+                        resolve(rows);
+                    }
+                );
+            } else {
+                resolve([]);
+            }
+
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
+//////////
+let handleGetUsersAssign = async (req, res) => {
+    let items = await getUsersAssign(req.params.id);
+    return res.json({
+        success: true,
+        items
+    })
+};
+let getUsersAssign = (id) => {
+    return new Promise((resolve, reject) => {
+        try {
+            db.query(
+                `SELECT u.id from users as u
+                INNER JOIN documentaryuser as du
+                ON u.id = du.iduser
+                WHERE du.idDocumentary = ${id}`,
+                function (err, rows) {
+                    if (err) {
+                        reject(err)
+                    }
+                    resolve(rows);
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
 module.exports = {
     handleGetCategorys: handleGetCategorys,
     handleAddDocumentary: handleAddDocumentary,
@@ -681,7 +766,8 @@ module.exports = {
     handleDeleteDocumentary: handleDeleteDocumentary,
     handleEditDocumentary: handleEditDocumentary,
     handleGetAttachments: handleGetAttachments,
-    handleGetUsers: handleGetUsers
+    handleGetUsers: handleGetUsers,
+    handleGetUsersAssign
 };
 
 

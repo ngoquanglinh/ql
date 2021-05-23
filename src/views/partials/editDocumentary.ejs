@@ -110,18 +110,32 @@
                             </div>
                         </div>
                         <%if(helpers.hasCap(claims,"manage|put")){%>
-                                <div>
+                                <div id="showDepSelect">
                                     <div class="sub-title p-2">Phòng ban</div>
                                     <div>
-                                        <select class="w-100" id="selectUser2" multiple="multiple" value="">
+                                        <select class="w-100" id="selectUser2" value="">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div id="showUserSelect">
+                                    <div class="sub-title p-2">Nhân viên</div>
+                                    <div>
+                                        <select class="w-100" id="selectUser3" multiple="multiple" value="">
                                         </select>
                                     </div>
                                 </div>
                                 <%}else{%>
-                                <div class="d-none">
+                                <div class="d-none" id="showDepSelect">
                                     <div class="sub-title p-2">Phòng ban</div>
                                     <div>
-                                        <select class="w-100" id="selectUser2" multiple="multiple" value="">
+                                        <select class="w-100" id="selectUser2" value="">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div id="showUserSelect">
+                                    <div class="sub-title p-2">Nhân viên</div>
+                                    <div>
+                                        <select class="w-100" id="selectUser3" multiple="multiple" value="">
                                         </select>
                                     </div>
                                 </div>
@@ -282,10 +296,8 @@
                 var data = res.items.map(x => { return { "id": x.id, "text": x.name } });
                 $("#selectUser2").select2({
                     placeholder: "Phòng ban...",
-                    allowClear: true,
+                    minimumResultsForSearch: Infinity,
                     data: data,
-                    tags: true,
-                    tokenSeparators: [',', ' ']
                 });
             })
         });
@@ -413,7 +425,6 @@
             $("#selectStatusDocumentary").prop("selected", "selected").trigger('change');
             if (data.type == 1) {
                 $("#processShow").removeClass("d-none");
-                console.log(data);
                 $("#process").val(data.process);
             }
 
@@ -448,9 +459,7 @@
                     }).then(res => {
                         if (res.success) {
                             notify("success", "Xóa thành công");
-                            $("#detailDocumentModal").hide();
-                            $('#detailDocumentModal').removeClass('show');
-                            $('.modal-backdrop').remove();
+                            $("#detailDocumentModal").modal("hide");
                         }
                     })
                 }
@@ -464,7 +473,8 @@
             const addressSending = $("#addressSendingEdit").val();
             const addressSign = $("#addressSignEdit").val();
             const selectCategory = $(".select-category").val();
-            const selectUser = $("#selectUser2").val();
+            const selectUser = $("#selectUser3").val();
+            const selectDep = $("#selectUser2").val();
             const calendarTomorrow = $("#calendarTomorrowEdit").val();
             const effectiveDate = $("#effectiveDateEdit").val();
             const expirationDate = $("#expirationDateEdit").val();
@@ -488,6 +498,7 @@
                 addressSign,
                 selectCategory,
                 selectUser,
+                selectDep,
                 calendarTomorrow: moment(flatpickr.parseDate(calendarTomorrow, "d/m/Y")).format("YYYY-MM-DD h:mm:ss"),
                 effectiveDate: moment(flatpickr.parseDate(effectiveDate, "d/m/Y")).format("YYYY-MM-DD h:mm:ss"),
                 expirationDate: moment(flatpickr.parseDate(expirationDate, "d/m/Y")).format("YYYY-MM-DD h:mm:ss"),
@@ -504,9 +515,10 @@
             }).then(res => {
                 if (res.success) {
                     notify("success", "Sửa thành công");
-                    setTimeout(() => {
-                        window.location.href = window.location.href;
-                    }, 1000);
+                    $("#detailDocumentModal").modal("hide");
+                    // setTimeout(() => {
+                    //     // window.location.href = window.location.href;
+                    // }, 1000);
                 } else {
                     notify("error", "Sửa không thành công");
                 }

@@ -13,7 +13,6 @@ let documentaryRoutes = (app) => {
     router.get("/category", loginController.checkLoggedIn, documentaryController.showCategory);
     router.delete("/category/:id", loginController.checkLoggedIn, documentaryController.handleDeleteCategory);
     router.post("/category", loginController.checkLoggedIn, documentaryController.handleAddCategory);
-    // router.get("/list", loginController.checkLoggedIn, documentaryController.handleShowListCategory);
     router.put("/category", loginController.checkLoggedIn, documentaryController.handleEditCategory);
 
 
@@ -23,6 +22,8 @@ let documentaryRoutes = (app) => {
     router.put("/:id", loginController.checkLoggedIn, documentaryController.handleEditDocumentary);
     router.get("/attachments/:id", loginController.checkLoggedIn, documentaryController.handleGetAttachments);
     router.get("/users/:id", loginController.checkLoggedIn, documentaryController.handleGetUsers);
+    router.get("/users-assign/:id", loginController.checkLoggedIn, documentaryController.handleGetUsersAssign);
+
     return app.use("/documentary", router);
 };
 module.exports = documentaryRoutes;

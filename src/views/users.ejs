@@ -67,40 +67,24 @@
                             <div class="modal-dialog" role="document" style="min-width: 80%">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h4>Cập nhật người dùng</h4>
+                                        <h4>Phân quyền</h4>
                                         <button type="button" class="close" data-dismiss="modal"
                                             aria-hidden="true">&times;</button>
                                     </div>
                                     <div class="modal-body">
                                         <p id="errorEdit" class="d-none text-danger"></p>
                                         <form>
-                                            <div class="row">
-                                                <div class="col-4">
-                                                    <div>
-                                                        <div class="sub-title p-2">Tên</div>
+                                            <div class="">
+                                                <div class="row  d-none">
+                                                    <div class="col-4">
+                                                        <div class="sub-title p-2">Tên người dùng</div>
                                                         <div>
                                                             <input type="text" class="form-control" id="nameEdit"
                                                                 value="" placeholder="Tên..." required>
                                                         </div>
                                                     </div>
-                                                    <!-- <div>
-                                                        <div class="sub-title p-2">Mật khẩu cũ</div>
-                                                        <div>
-                                                            <input type="password" class="form-control"
-                                                                id="oldPasswordEdit" value="" placeholder="Mật khẩu..."
-                                                                required>
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <div class="sub-title p-2">Mật khẩu mới</div>
-                                                        <div>
-                                                            <input type="password" class="form-control"
-                                                                id="newPasswordEdit" value=""
-                                                                placeholder="Mật khẩu mới..." required>
-                                                        </div>
-                                                    </div> -->
                                                 </div>
-                                                <div class="col-8">
+                                                <div class="">
                                                     <div id="deparmentUser" class="d-flex justify-content-around">
 
                                                     </div>
@@ -127,6 +111,7 @@
                                 <th>#</th>
                                 <th>Tên</th>
                                 <th>Email</th>
+                                <th>Chức vụ</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -136,6 +121,9 @@
                             <td><%= index+1 %></td>
                             <td><%= item.username %></td>
                             <td><%= item.email %></td>
+                            <td>
+                                <%= helpers.join(item.roles) %>
+                            </td>
                             <td>
                                 <i class="far fa-trash-alt deleteUser" attr-id="<%= item.id %>"></i>
                                 <i class="far fa-edit editUser" onclick="editUser(<%= JSON.stringify(item) %>)"
@@ -192,20 +180,24 @@
                 const username = $("#nameAdd").val();
                 const password = $("#passwordAdd").val();
                 const email = $("#emailAdd").val();
-                // const selectUserDep = $("#selectUserDep").val();
-                const data = {
-                    username, password, email
-                }
-                callApi('user/', 'POST', data).then(res => {
-                    return res.json();
-                }).then(res => {
-                    if (res.success) {
-                        notify("success", "Thêm thành công");
-                        setTimeout(() => {
-                            window.location.href = window.location.href;
-                        }, 1000);
+                if (!username || !password || !email) {
+                    notify("error", "Bạn cần điền đầy đủ thông tin");
+                } else {
+                    const data = {
+                        username, password, email
                     }
-                })
+                    callApi('user/', 'POST', data).then(res => {
+                        return res.json();
+                    }).then(res => {
+                        if (res.success) {
+                            notify("success", "Thêm thành công");
+                            setTimeout(() => {
+                                window.location.href = window.location.href;
+                            }, 1000);
+                        }
+                    })
+                }
+
             })
             // todo: edit user
             function editUser(item) {

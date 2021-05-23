@@ -24,6 +24,9 @@ let userRoutes = (app) => {
     router.get("/claim", loginController.checkLoggedIn, departmentController.handleGetListClaim);
     router.post("/role-claim", loginController.checkLoggedIn, departmentController.handleEditRoleClaim);
 
+    router.get("/doc-dep/:id", loginController.checkLoggedIn, departmentController.handleGetAllDepartmentsDoc);
+    router.get("/lists-user/:id", loginController.checkLoggedIn, departmentController.handleUserDepartment);
+
     return app.use("/department", router);
 };
 module.exports = userRoutes;

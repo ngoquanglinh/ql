@@ -1,0 +1,140 @@
+<div id="page-wrapper">
+    <div id="page-inner">
+        <!-- /. ROW  -->
+        <div class="mt-2 mb-3 d-flex justify-content-end">
+            <%if(helpers.hasCap(claims,"manage|post")){%>
+            <button class="btn btn-primary" data-toggle="modal" onclick="showModalAddDep()">Thêm</button>
+            <%}%>
+        </div>
+        <div class="">
+            <% lists.forEach( (item,index) => { %>
+            <div class="panel panel-default mb-1 border-bottom pointer p-1">
+                <div class=" panel-heading">
+                    <h4 class="panel-title">
+                        <div data-toggle="collapse" class="panel-user" data-id="<%= item.idSender %>"
+                            data-parent="#accordion" href="#collapse<%= item.idSender %>" class="collapsed">
+                            <div class="d-flex justify-content-between">
+                                <div class="d-flex">
+                                    <% if(item.avatar) { %>
+                                    <div>
+                                        <img src=<%-item.avatar%> class="avatar" />
+                                    </div>
+                                    <%}else{%>
+                                    <div class="avatar__name">
+                                        <span><%-helpers.charAt(item.username)%></span>
+                                    </div>
+                                    <%}%>
+                                    <div class="ml-2">
+                                        <span class="p-1"><%= item.username %></span>
+                                    <p class="m-0 p-1 ml-1 font-weight-bold" id="userTotal<%= item.idSender %>"
+                                        data-total="<%-helpers.length(item.items)%>">
+                                        <%-helpers.length(item.items)%> Công văn
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                </h4>
+            </div>
+            <div id="collapse<%= item.idSender %>" class="panel-collapse collapse" style="height: 0px;">
+                <div class="row p-3 m-0 border-top border-bottom">
+                    <div class="col-6">
+                        <div class="text-dark font-weight-bold">Công văn</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex justify-content-between h-100 align-items-center">
+                            <div class="flex-basis-25">
+                                <div class="d-flex align-items-center font-weight-bold">Ngày nhận</div>
+                            </div>
+                            <div class="flex-basis-25">
+                                <div class="d-flex align-items-center font-weight-bold">Ngày kết thúc</div>
+                            </div>
+                            <div class="flex-basis-25 font-weight-bold">
+                                Tiến trình
+                            </div>
+                            <div class="flex-basis-25">
+                                <div class="d-flex align-items-center font-weight-bold">
+                                    Trạng thái
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="documentaryUser<%= item.idSender %>">
+                    <% item.items.forEach( (it,i) => { %>
+                    <div id="documentary-<%= it.idDocumentary %>"
+                        class="detail-document row m-0 panel-body p-2 border-bottom mb-1"
+                        data-value="<%=encodeURIComponent(JSON.stringify(it))%>">
+                        <div class="col-6">
+                            <div class="d-flex justify-content-between h-100 align-items-center">
+                                <div class="">
+                                    <div class="d-flex align-items-center"><%= it.name %></div>
+                                </div>
+                                <div class="d-flex flex-wrap home-list-tags">
+                                    <% it.tags.forEach( x => { %>
+                                    <div data-id="<%= x.id %>" class="p-2 ml-2 rounded pointer text-white"
+                                        style="background-color:<%= x.code %>">
+                                        <%= x.name %>
+                                    </div>
+                                    <%})%>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex justify-content-between h-100 align-items-center">
+                                <div class="flex-basis-25">
+                                    <div class="d-flex align-items-center">
+                                        <%=moment(it.effectiveDate).format("DD-MM-YYYY")%>
+                                    </div>
+                                </div>
+                                <div class="flex-basis-25">
+                                    <div class="d-flex align-items-center">
+                                        <%=moment(it.expirationDate).format("DD-MM-YYYY")%>
+                                    </div>
+                                </div>
+                                <div class="flex-basis-25">
+                                    <% if(it.type == 1) { %>
+                                    <div class="progress mb-0 d-flex align-items-center mr-2">
+                                        <div class="progress-bar progress-bar-striped active" role="progressbar"
+                                            aria-valuenow="<%=it.process%>" aria-valuemin="0" aria-valuemax="100"
+                                            style="width:<%=it.process%>%">
+                                            <%=it.process%>%
+                                        </div>
+                                    </div>
+                                    <%}%>
+                                </div>
+                                <div class="flex-basis-25">
+                                    <div class="d-flex align-items-center">
+                                        <button  class="btn btn-primary" aria-expanded="true">
+                                            <% if(it.status == 0) { %>
+                                    Mới
+                                    <%}else if(it.status == 1){%>
+                                    Chưa xử lý
+                                    <%}else{%>
+                                    Đã xử lý
+                                    <%}%>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <% }) %>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                        <div>
+                            <%- include("./partials/editDocumentary.ejs")  %>
+                        </div>
+                        <div>
+                            <%- include("./partials/addDocumentary.ejs")  %>
+                        </div>
+
+                    </div>
+                    <!-- /. PAGE INNER  -->
+                    <script>
+                        function showModalAddDep() {
+                            $("#addDocumentary").modal("show");
+                        }
+                    </script>

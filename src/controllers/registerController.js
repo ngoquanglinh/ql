@@ -42,8 +42,9 @@ let initSystem = async (req, res) => {
         ['put'],
         ['delete'],
         ['get'],
-        ['manager'],
-        ['view']
+        ['manage'],
+        ['view'],
+        ['manageDepartment']
     ];
     db.query(
         sql, [claim],

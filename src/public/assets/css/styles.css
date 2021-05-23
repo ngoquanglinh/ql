@@ -41,3 +41,6 @@
 .minicolors-theme-default .minicolors-input {
   height: 30px !important;
 }
+button{
+  outline: none;
+}

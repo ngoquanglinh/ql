@@ -7,6 +7,10 @@ function length(data) {
 function formatDate(date) {
     return moment(date).format("DD-MM-YYYY");
 }
+function join(data) {
+    data = data.map(x => { return x.name });
+    return data.join();
+}
 function hasCap(claims, caps) {
     caps = caps.split(/\||,|;/);
     if (claims.length == 0) return false;
@@ -22,4 +26,5 @@ module.exports = {
     charAt: charAt,
     length: length,
     formatDate: formatDate,
+    join
 }
