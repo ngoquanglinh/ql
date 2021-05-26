@@ -146,8 +146,7 @@ let getCategorys = () => {
 // todo add documentary
 let handleAddDocumentary = async (req, res) => {
     let result = await adddDocumentary(req.body, req.user.id);
-    const item = await getDocumentaryById(result.insertId);
-    // const users = await getDocumentaryUser(result.insertId);
+    const item = await getDocumentaryById(result.insertId, req.user);
     if (item) {
         socket.io.emit("documentary", { action: "add", data: item });
     }
@@ -257,17 +256,20 @@ let getUserByDepartments = (data) => {
         }
     });
 };
-let getDocumentaryById = (id) => {
+let getDocumentaryById = (id, user) => {
     return new Promise((resolve, reject) => {
         try {
-            var sql = `SELECT d.id,d.name,d.status,d.createdAt,d.effectiveDate,d.expirationDate,d.process,d.type,dd.idDepartment FROM documentary as d
+            var sql = `SELECT d.id,d.name,d.status,d.createdAt,d.effectiveDate,d.expirationDate,d.type,dd.idDepartment FROM documentary as d
                 INNER JOIN departmentdocumentarys as dd ON d.id = dd.idDocumentary
                 where d.id  = ${id}`;
             db.query(
                 sql, id,
-                function (err, rows) {
+                async function (err, rows) {
                     if (err) reject(err)
-                    resolve(rows[0]);
+                    rows.forEach(async (x, i) => {
+                        x.process = await getProsess(x.id, user);
+                        if (i == rows.length - 1) resolve(rows[0]);
+                    })
                 }
             );
         } catch (err) {
@@ -507,7 +509,11 @@ let deleteDocumentary = (id) => {
 // todo : edit documentary
 let handleEditDocumentary = async (req, res) => {
     let users = await editDocumentary(req.body, req.params.id);
-    const item = await getDocumentaryById(req.params.id);
+    if (req.body.type == "1") {
+        await handleProgess(req.user.id, req.params.id, req.body);
+    }
+    const item = await getDocumentaryById(req.params.id, req.user);
+
     if (item) {
         socket.io.emit("documentary", { action: "edit", data: item });
     }
@@ -548,15 +554,6 @@ let editDocumentary = (data, id) => {
                             }
                         );
 
-                        // sql = `INSERT INTO progessdocumentarys (idUser,idDocumentary) VALUES ?`;
-                        // db.query(
-                        //     sql,
-                        //     [users],
-                        //     function (err, rows1) {
-                        //         console.log(rows1, "vao day");
-                        //         if (err) reject(err)
-                        //     }
-                        // );
                     }
                     if (data.selectDep) {
                         sql = `INSERT INTO departmentdocumentarys (idDocumentary,idDepartment ) VALUES  ("${id}","${data.selectDep}")`;
@@ -588,7 +585,54 @@ let editDocumentary = (data, id) => {
         }
     });
 };
-
+let handleProgess = (userId, id, data) => {
+    return new Promise((resolve, reject) => {
+        try {
+            if (data.selectUser) {
+                data.selectUser.forEach(async function (item, i) {
+                    let issset = await checkExitsProgess(item, id);
+                    if (issset.length > 0) {
+                        if (item == userId) {
+                            db.query(
+                                `Update progessdocumentarys as pd  SET pd.progess = ${data.process} where pd.idUser=${userId} and pd.idDocumentary=${id}`,
+                                function (err, rows) {
+                                    if (err) reject(err);
+                                }
+                            );
+                        }
+                    } else {
+                        db.query(
+                            `INSERT INTO progessdocumentarys (idUser,idDocumentary ) VALUES  ("${item}","${id}")`,
+                            function (err, rows) {
+                                if (err) reject(err);
+                            }
+                        );
+                    }
+                    if (i == data.selectUser.length - 1) resolve();
+                })
+            } else {
+                resolve();
+            }
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+let checkExitsProgess = (userId, id) => {
+    return new Promise((resolve, reject) => {
+        try {
+            db.query(
+                `SELECT * FROM progessdocumentarys as pd where pd.idUser = ${userId} and pd.idDocumentary=${id}`,
+                function (err, rows) {
+                    if (err) reject(err);
+                    resolve(rows);
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
 let getDepartmentdocumentarys = (id) => {
     return new Promise((resolve, reject) => {
         try {
@@ -692,7 +736,6 @@ let departments = (user) => {
                 sql,
                 function (err, rows) {
                     if (err) reject(err);
-                    console.log(rows);
                     resolve(rows);
                 }
             );
@@ -753,6 +796,38 @@ let getUsersAssign = (id) => {
         }
     });
 };
+//////////
+let handleGetProsess = async (req, res) => {
+    let items = await getProsess(req.params.id, req.user);
+    return res.json({
+        success: true,
+        items
+    })
+};
+let getProsess = (id, user) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const check = await checkAuth(user, "manage|manageDepartment");
+            let sql = "";
+            if (check) {
+                sql = `SELECT pd.progess FROM progessdocumentarys pd Where 	idDocumentary  = ${id}`;
+            } else {
+                sql = `SELECT pd.progess FROM progessdocumentarys pd Where 	idDocumentary  = ${id} and idUser=${user.id}`;
+            }
+            db.query(
+                sql,
+                function (err, rows) {
+                    if (err) {
+                        reject(err)
+                    }
+                    resolve(rows);
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
 
 module.exports = {
     handleGetCategorys: handleGetCategorys,
@@ -767,7 +842,8 @@ module.exports = {
     handleEditDocumentary: handleEditDocumentary,
     handleGetAttachments: handleGetAttachments,
     handleGetUsers: handleGetUsers,
-    handleGetUsersAssign
+    handleGetUsersAssign,
+    handleGetProsess
 };
 
 

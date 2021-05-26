@@ -16,9 +16,8 @@
                         </div>
                         <div class="">
                             <div class="sub-title p-2">Tóm tắt</div>
-
                             <div>
-                                <%if(helpers.hasCap(claims,"manage|put")){%>
+                                <%if(helpers.hasCap(claims,"manage|manageDepartment|put")){%>
                                 <textarea class="form-control" rows="3" value="" id="summaryEdit"></textarea>
                                 <%}else{%>
                                 <textarea class="form-control" rows="3" value="" id="summaryEdit" disabled></textarea>
@@ -28,7 +27,7 @@
                         <div class="">
                             <div class="sub-title p-2">Tệp đính kèm</div>               
                             <div>
-                                <%if(helpers.hasCap(claims,"manage|put")){%>
+                                <%if(helpers.hasCap(claims,"manage|manageDepartment|put")){%>
                                 <input type="file" class="form-control-file" value="" id="fileUploadsEdit" multiple>
                                 <%}else{%>
                                 <input type="file" class="form-control-file" value="" id="fileUploadsEdit" multiple
@@ -41,7 +40,7 @@
                         </div>
                         <div class="sub-title p-2">Nội dung</div>
                         <div>
-                            <%if(helpers.hasCap(claims,"manage|put")){%>
+                            <%if(helpers.hasCap(claims,"manage|manageDepartment|put")){%>
                                 <textarea cols="10" class="form-control" rows="3"
                                     id="contentDocumentaryEdit"></textarea>
                                 <%}else{%>
@@ -53,7 +52,7 @@
                     <div class="col-4">
                         <div>
                             <div class="sub-title p-2">Số văn bản</div>
-                            <%if(helpers.hasCap(claims,"manage|put")){%>
+                            <%if(helpers.hasCap(claims,"manage|manageDepartment|put")){%>
                                 <input type="text" class="form-control" value="" id="numberDocumentaryEdit"
                                     placeholder="Số văn bản...">
                                 <%}else{%>
@@ -64,7 +63,7 @@
                         <div>
                             <div class="sub-title p-2">Tên văn bản</div>
                             <div>
-                                <%if(helpers.hasCap(claims,"manage|put")){%>
+                                <%if(helpers.hasCap(claims,"manage|manageDepartment|put")){%>
                                 <input type="text" class="form-control" id="nameEdit" value=""
                                     placeholder="Tên công văn...">
                                 <%}else{%>
@@ -76,7 +75,7 @@
                         <div>
                             <div class="sub-title p-2">Nơi gửi</div>
                             <div>
-                                <%if(helpers.hasCap(claims,"manage|put")){%>
+                                <%if(helpers.hasCap(claims,"manage|manageDepartment|put")){%>
                                 <input type="text" class="form-control" id="addressSendingEdit" value=""
                                     placeholder="Tên công văn...">
                                 <%}else{%>
@@ -88,7 +87,7 @@
                         <div>
                             <div class="sub-title p-2">Nơi ký</div>
                             <div>
-                                <%if(helpers.hasCap(claims,"manage|put")){%>
+                                <%if(helpers.hasCap(claims,"manage|manageDepartment|put")){%>
                                 <input type="text" class="form-control" value="" id="addressSignEdit" value=""
                                     placeholder="Tên công văn...">
                                 <%}else{%>
@@ -100,7 +99,7 @@
                         <div>
                             <div class="sub-title p-2">Loại công việc</div>
                             <div>
-                                <%if(helpers.hasCap(claims,"manage|put")){%>
+                                <%if(helpers.hasCap(claims,"manage|manageDepartment|put")){%>
                                 <select class="select-category w-100" value="">
                                 </select>
                                 <%}else{%>
@@ -109,7 +108,7 @@
                                 <%}%>
                             </div>
                         </div>
-                        <%if(helpers.hasCap(claims,"manage|put")){%>
+                        <%if(helpers.hasCap(claims,"manage|manageDepartment")){%>
                                 <div id="showDepSelect">
                                     <div class="sub-title p-2">Phòng ban</div>
                                     <div>
@@ -149,7 +148,7 @@
                         <div>
                             <div class="sub-title p-2">Ngày hiệu lực</div>
                             <div>
-                                <%if(helpers.hasCap(claims,"manage|put")){%>
+                                <%if(helpers.hasCap(claims,"manage|manageDepartment|put")){%>
                                 <input type="text" class="form-control" id="effectiveDateEdit" value="">
                                 <%}else{%>
                                 <input disabled type="text" class="form-control" id="effectiveDateEdit" value="">
@@ -159,7 +158,7 @@
                         <div>
                             <div class="sub-title p-2">Ngày hết hiệu lực</div>
                             <div>
-                                <%if(helpers.hasCap(claims,"manage|put")){%>
+                                <%if(helpers.hasCap(claims,"manage|manageDepartment|put")){%>
                                 <input type="text" class="form-control" id="expirationDateEdit" value="">
                                 <%}else{%>
                                 <input disabled type="text" class="form-control" id="expirationDateEdit" value="">
@@ -169,7 +168,7 @@
                         <div class="d-none" id="processShow">
                             <div class="sub-title p-2">Tiến trình (%)</div>
                             <div>
-                                <%if(helpers.hasCap(claims,"manage|put")){%>
+                                <%if(helpers.hasCap(claims,"manage|manageDepartment|put")){%>
                                 <input type="number" class="form-control" id="process" value="" min="10" max="100">
                                 <%}else{%>
                                 <input disabled type="number" class="form-control" id="process" value="" min="10"
@@ -186,7 +185,7 @@
                         <div class="d-flex justify-content-start">
                             <div class="w-50">
                                 <div class="sub-title p-2">Loại công văn</div>
-                                <%if(helpers.hasCap(claims,"manage|put")){%>
+                                <%if(helpers.hasCap(claims,"manage|manageDepartment")){%>
                                 <select id="selectTypeDocumentary" class="w-100" value="">
                                 </select>
                                 <%}else{%>
@@ -204,7 +203,7 @@
                     </div>
                 </div>
                 <div class="modal-footer mt-1" id="dataIdDocument">
-                    <%if(helpers.hasCap(claims,"manage|delete")){%>
+                    <%if(helpers.hasCap(claims,"manage|manageDepartment|delete")){%>
                                 <button type="button" class="btn btn-danger" id="deleteDocument"
                                     data-dismiss="modal">Xóa</button>
                                 <%}%>

@@ -23,6 +23,7 @@ let documentaryRoutes = (app) => {
     router.get("/attachments/:id", loginController.checkLoggedIn, documentaryController.handleGetAttachments);
     router.get("/users/:id", loginController.checkLoggedIn, documentaryController.handleGetUsers);
     router.get("/users-assign/:id", loginController.checkLoggedIn, documentaryController.handleGetUsersAssign);
+    router.get("/prosess/:id", loginController.checkLoggedIn, documentaryController.handleGetProsess);
 
     return app.use("/documentary", router);
 };

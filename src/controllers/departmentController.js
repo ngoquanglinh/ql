@@ -471,19 +471,46 @@ let getAllDepartmentsDoc = (id, user) => {
             const checkManage = await checkAuth(user, "manage|manageDepartment");
             let sql = '';
             if (checkManage) {
-                sql = `SELECT d.id,d.name,d.status,d.createdAt,d.effectiveDate,d.expirationDate,d.process,d.type,dd.idDepartment FROM documentary as d
+                sql = `SELECT d.id,d.name,d.status,d.createdAt,d.effectiveDate,d.expirationDate,d.type,dd.idDepartment FROM documentary as d
                 INNER JOIN departmentdocumentarys as dd ON d.id = dd.idDocumentary
                 where dd.idDepartment  = ${id}`;
             } else {
-                sql = `SELECT d.id,d.name,d.status,d.createdAt,d.effectiveDate,d.expirationDate,d.process,d.type,dd.idDepartment FROM documentary as d
+                sql = `SELECT d.id,d.name,d.status,d.createdAt,d.effectiveDate,d.expirationDate,d.type,dd.idDepartment FROM documentary as d
                 INNER JOIN departmentdocumentarys as dd ON d.id = dd.idDocumentary
                 INNER JOIN documentaryuser as du ON du.idDocumentary = d.id
                 where dd.idDepartment  = ${id} and du.iduser = ${user.id}`;
             }
             db.query(
                 sql,
-                function (err, rows) {
+                async function (err, rows) {
                     if (err) reject(err);
+                    rows.forEach(async (x, i) => {
+                        x.process = await getProsess(x.id, user);
+                        if (i == rows.length - 1) resolve(rows);
+                    })
+                }
+            );
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+let getProsess = (id, user) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const check = await checkAuth(user, "manage|manageDepartment");
+            let sql = "";
+            if (check) {
+                sql = `SELECT pd.progess FROM progessdocumentarys pd Where 	idDocumentary  = ${id}`;
+            } else {
+                sql = `SELECT pd.progess FROM progessdocumentarys pd Where 	idDocumentary  = ${id} and idUser=${user.id}`;
+            }
+            db.query(
+                sql,
+                function (err, rows) {
+                    if (err) {
+                        reject(err)
+                    }
                     resolve(rows);
                 }
             );

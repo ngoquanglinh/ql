@@ -202,6 +202,17 @@
                             }
                         }
                     })
+
+                    callApi('documentary/prosess/' + id, 'Get').then(res => {
+                        return res.json();
+                    }).then(res => {
+                        if (res.success) {
+                            let prosess = res.items.map(x => { return x.progess });
+                            prosess = prosess.reduce((a, b) => parseInt(a + b), 0);
+                            $("#process").val(prosess / res.items.length);
+                        }
+                    })
+
                     callApi('documentary/' + id, 'Get').then(res => {
                         return res.json();
                     }).then(res => {
@@ -223,10 +234,8 @@
                             tinymce.get("contentDocumentaryEdit")?.setContent(res.items[0].content);
                             $("#selectTypeDocumentary").prop("selected", "selected").trigger('change');
                             $("#selectStatusDocumentary").prop("selected", "selected").trigger('change');
-                            console.log(res.items, "a");
                             if (res.items[0].type == 1) {
-                                $("#processShow").removeClass("d-none");
-                                $("#process").val(res.items[0].process);
+                                $("#processShow").removeClass("d-none")
                             }
                         }
                     })
@@ -302,6 +311,9 @@
                         </div>
                         `;
                                 res.items.map((x, i) => {
+                                    let pr = x.process.map(x => { return x.progess });
+                                    pr = pr.reduce((a, b) => parseInt(a + b), 0);
+                                    pr = pr / x.process.length;
                                     rows +=
                                         `<div class="row p-3 m-0 border-top border-bottom" id="doc-${x.id}" data-id="${x.idDepartment}" onclick="detailDoc(${x.id})">
                                 <div class="col-6">
@@ -320,8 +332,8 @@
                                             `   
                                             <div class="progress mb-0 d-flex align-items-center mr-2">
                                                 <div class="progress-bar progress-bar-striped active" role="progressbar"
-                                                    aria-valuenow="${x.process}" aria-valuemin="0" aria-valuemax="100"
-                                                    style="width:${x.process}%;font-size: 0.8rem;">${x.process}%</div>
+                                                    aria-valuenow="${pr}" aria-valuemin="0" aria-valuemax="100"
+                                                    style="width:${pr}%;font-size: 0.8rem;">${pr}%</div>
                                             </div>
                             `: ''}
                                         </div>
