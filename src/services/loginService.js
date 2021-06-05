@@ -20,6 +20,7 @@ let handleLogin = (email, password) => {
 
 
 let findUserByEmail = (email) => {
+    console.log(email);
     return new Promise((resolve, reject) => {
         try {
             DBConnection.query(
@@ -28,6 +29,7 @@ let findUserByEmail = (email) => {
                     if (err) {
                         reject(err)
                     }
+                    console.log(rows);
                     let user = rows[0];
                     resolve(user);
                 }

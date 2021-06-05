@@ -39,13 +39,13 @@
                                 </div>
                             </div>
                             <div class="">
-                                <div class="sub-title p-2">Loại văn bản</div>
+                                <div class="sub-title p-2">Loại công việc</div>
                                 <div>
                                     <select class="select-category w-100" value="">
                                     </select>
                                 </div>
                             </div>
-                            <%if(helpers.hasCap(claims,"manage")){%>
+                            <%if(helpers.hasCap(claims,"manage|post|manageDepartment")){%>
                             <div class="">
                                 <div class="sub-title p-2">Phòng ban</div>
                                 <div>

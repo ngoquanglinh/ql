@@ -395,16 +395,22 @@ let updateProfileUser = (id, data) => {
 // todo: update password
 let handleEditPassword = async (req, res) => {
     const pass = await updateProfilePassword(req.params.id, req.body);
-    const update = await updatePass(pass, req.params.id);
-    if (update) {
-        return res.json({
-            success: true,
-            update,
-        })
-    } else {
+    if (!pass) {
         return res.json({
             success: false,
         })
+    } else {
+        const update = await updatePass(pass, req.params.id);
+        if (update) {
+            return res.json({
+                success: true,
+                update,
+            })
+        } else {
+            return res.json({
+                success: false,
+            })
+        }
     }
 };
 let updateProfilePassword = (id, data) => {
@@ -415,7 +421,11 @@ let updateProfilePassword = (id, data) => {
                 if (hash) {
                     bcrypt.compare(data.oldPassProfile, user.password, async function (err, resp) {
                         if (err) reject();
-                        resolve(hash);
+                        if (resp) {
+                            resolve(hash);
+                        } else {
+                            resolve(resp);
+                        }
                     });
                 } else {
                     reject(err)

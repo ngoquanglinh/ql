@@ -6,69 +6,32 @@
                     Trang chủ
                 </a>
             </li>
+            <%if(helpers.hasCap(claims,"manage")){%>
             <li>
                 <a href="/user/list"><i class="fas fa-users"></i>Người dùng</a>
             </li>
+            <%}%>
+            <%if(helpers.hasCap(claims,"manage")){%>
             <li>
                 <a href="/documentary/category"><i class="fas fa-tasks"></i>Danh mục công việc
                 </a>
             </li>
+            <%}%>
             <%if(helpers.hasCap(claims,"manage")){%>
             <li>
                 <a href="/department"><i class="fa fa-desktop"></i>Phòng ban</a>
             </li>
             <%}%>
+            <%if(helpers.hasCap(claims,"manage")){%>
             <li>
                 <a href="/tags"><i class="fas fa-tags"></i>Danh sách thẻ
                 </a>
             </li>
+            <%}%>
             <li>
                 <a href="/profile"><i class="fas fa-user-circle"></i>Tài khoản
                 </a>
             </li>
-            <!-- 
-            <li>
-                <a href="tab-panel.html"><i class="fa fa-qrcode"></i> Tabs & Panels</a>
-            </li>
-
-            <li>
-                <a href="table.html"><i class="fa fa-table"></i> Responsive Tables</a>
-            </li>
-            <li>
-                <a href="form.html"><i class="fa fa-edit"></i> Forms </a>
-            </li>
-
-
-            <li>
-                <a href="#"><i class="fa fa-sitemap"></i> Multi-Level Dropdown<span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li>
-                        <a href="#">Second Level Link</a>
-                    </li>
-                    <li>
-                        <a href="#">Second Level Link</a>
-                    </li>
-                    <li>
-                        <a href="#">Second Level Link<span class="fa arrow"></span></a>
-                        <ul class="nav nav-third-level">
-                            <li>
-                                <a href="#">Third Level Link</a>
-                            </li>
-                            <li>
-                                <a href="#">Third Level Link</a>
-                            </li>
-                            <li>
-                                <a href="#">Third Level Link</a>
-                            </li>
-
-                        </ul>
-
-                    </li>
-                </ul>
-            </li>
-            <li>
-                <a href="empty.html"><i class="fa fa-fw fa-file"></i> Empty Page</a>
-            </li> -->
         </ul>
 
     </div>

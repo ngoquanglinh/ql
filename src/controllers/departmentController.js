@@ -473,11 +473,13 @@ let getAllDepartmentsDoc = (id, user) => {
             if (checkManage) {
                 sql = `SELECT d.id,d.name,d.status,d.createdAt,d.effectiveDate,d.expirationDate,d.type,dd.idDepartment FROM documentary as d
                 INNER JOIN departmentdocumentarys as dd ON d.id = dd.idDocumentary
+                order by d.createdAt desc
                 where dd.idDepartment  = ${id}`;
             } else {
                 sql = `SELECT d.id,d.name,d.status,d.createdAt,d.effectiveDate,d.expirationDate,d.type,dd.idDepartment FROM documentary as d
                 INNER JOIN departmentdocumentarys as dd ON d.id = dd.idDocumentary
                 INNER JOIN documentaryuser as du ON du.idDocumentary = d.id
+                order by d.createdAt desc
                 where dd.idDepartment  = ${id} and du.iduser = ${user.id}`;
             }
             db.query(

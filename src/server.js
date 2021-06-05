@@ -60,11 +60,7 @@ tagsRoutes(app);
 profileRoutes(app);
 //
 
-//Tạo socket 
 io.on('connection', function (socket) {
-    // socket.on('join', function (data) {
-    //     // io.sockets.emit('documentary', data);
-    // });
     socket.on('documentary', function (data) {
         io.sockets.emit('documentary', data);
     });

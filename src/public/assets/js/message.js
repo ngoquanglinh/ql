@@ -94,7 +94,7 @@ socket.on("documentary", function ({ action, data }) {
                         </div >
                         <div class="flex-basis-25">
                             <div class="d-flex align-items-center">
-                            <button class="btn btn-primary">
+                            <button class=btn  ${data.status == 0 ? "btn-primary" : data.status == 1 ? "btn-warning" : "btn-success"}">
                                 ${data.status == 0 ? "Mới" : data.status == 1 ? "Chưa xử lý" : "Đã xử lý"}
                             </button>
                             </div>

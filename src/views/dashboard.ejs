@@ -30,7 +30,7 @@
             <!--  -->
             <!--  -->
             <%if(helpers.hasCap(claims,"manage")){%>
-            <div class="accordion pointer" id="accordionExample1">
+            <div class="accordion pointer d-none" id="accordionExample1">
                 <div class="card mb-1">
                     <div class="card-header" id="heading-dep" style="height: 65px;">
                         <div class="collapsed h-100 font-weight-bold d-flex align-items-center justify-content-between;"
@@ -96,15 +96,21 @@
                                         </div>
                                         <div class="flex-basis-25">
                                             <div class="d-flex align-items-center font-weight-bold">
-                                                    <button class="btn btn-primary" aria-expanded="true">
-                                                        <% if(item.status == 0) { %>
-                                            Mới
+                                                <% if(item.status == 0) { %>
+                                            <button class="btn btn-primary" aria-expanded="true">
+                                                Mới
+                                            </button>
                                             <%}else if(item.status == 1){%>
-                                            Chưa xử lý
+                                            <button class="btn btn-info" aria-expanded="true">
+                                                Chưa xử lý
+                                            </button>
+                                            </button>
                                             <%}else{%>
-                                            Đã xử lý
+                                            <button class="btn btn-success" aria-expanded="true">
+                                                Đã xử lý
+                                            </button>
                                             <%}%>
-                                                </button>
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -339,7 +345,7 @@
                                         </div>
                                         <div class="flex-basis-25">
                                             <div class="d-flex align-items-center">
-                                                <button  class="btn btn-primary" aria-expanded="true">
+                                                <button  class="btn ${x.status == 0 ? "btn-primary" : x.status == 1 ? "btn-warning" : "btn-success"}" aria-expanded="true">
                                                 ${x.status == 0 ? " Mới" : x.status == 1 ? "Chưa xử lý" : "Đã xử lý"}
                                                 </button>
                                             </div>
